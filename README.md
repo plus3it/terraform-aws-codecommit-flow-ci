@@ -1,2 +1,2 @@
 # terraform-aws-codecommit-releases
-Tags a codecommit repo when a versioning condition has been met on the default branch
+Tag an AWS CodeCommit repo when the version is incremented in default branch.
