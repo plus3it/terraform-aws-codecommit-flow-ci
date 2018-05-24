@@ -1,0 +1,12 @@
+# Terraform-managed files
+*.tfstate
+*.tfstate.backup
+.terraform
+terraform.tfstate.d
+
+# Python local files
+__pycache__
+
+# Private directories
+.env
+.private

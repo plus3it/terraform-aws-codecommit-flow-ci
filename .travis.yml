@@ -1,0 +1,40 @@
+language: bash
+
+env:
+  global:
+    - REPO="${TRAVIS_REPO_SLUG#*/}"
+    - OWNER=plus3it
+    - DEPLOY_SLUG=$OWNER/$REPO
+    - TF_INPUT=0
+
+jobs:
+  include:
+    - stage: test
+      env:
+        - JOB="Terraform Format Verification"
+      before_script:
+        - make tf.tools
+      script:
+        - make tf.lint
+    - stage: deploy
+      env:
+        - JOB="Deploy to GitHub Releases"
+        - PRIOR_VERSION=$(git describe --abbrev=0 --tags)
+        - RELEASE_VERSION=$(grep '^current_version' $TRAVIS_BUILD_DIR/.bumpversion.cfg | sed 's/^.*= //')
+        - RELEASE_BODY="* [$REPO v$RELEASE_VERSION changes](https://github.com/$OWNER/$REPO/compare/$PRIOR_VERSION...$RELEASE_VERSION)"
+      script: skip
+      before_deploy:
+        - echo PRIOR_VERSION = $PRIOR_VERSION
+        - echo RELEASE_VERSION = $RELEASE_VERSION
+        - echo RELEASE_BODY = $RELEASE_BODY
+      deploy:
+        provider: releases
+        name: $RELEASE_VERSION
+        tag_name: $RELEASE_VERSION
+        body: $RELEASE_BODY
+        draft: false
+        api_key:
+        on:
+          branch: master
+          repo: $DEPLOY_SLUG
+          condition: '"$PRIOR_VERSION" != "$RELEASE_VERSION"'
