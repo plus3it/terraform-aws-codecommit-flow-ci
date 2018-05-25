@@ -114,10 +114,10 @@ locals {
       build:
         commands:
           - |
-            if [ $(semver -r '<='"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null)$? -eq 0 ]
+            if semver -r '<='"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null
             then
               echo "Version has not incremented, skipping release"
-            elif [ $(semver -r '>'"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null)$? -eq 0 ]
+            elif semver -r '>'"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null
             then
               echo "Releasing version $RELEASE_VERSION"
               git config credential.helper '!aws codecommit credential-helper $@' || exit 1
