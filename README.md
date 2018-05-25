@@ -1,4 +1,5 @@
 # terraform-aws-codecommit-releases
+
 Tag an AWS CodeCommit repo when the version is incremented in the default
 branch.
 
@@ -24,7 +25,7 @@ the tag `1.0.1` would be created on the default branch HEAD.
 
 ```hcl
 module "codecommit-releases" {
-  source = "git::https://github.com/plus3it/terraform-aws-codecommit-releases"
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-releases.git"
 
   codecommit_repo_name    = "foo"  # This is the only required parameter
   default_branch          = "master"
