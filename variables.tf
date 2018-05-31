@@ -3,9 +3,9 @@ variable "codecommit_repo_name" {
   description = "Name of the CodeCommit repository"
 }
 
-variable "default_branch" {
+variable "release_branch" {
   type        = "string"
-  description = "Name of the default branch"
+  description = "Name of the release branch"
   default     = "master"
 }
 

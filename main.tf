@@ -75,7 +75,7 @@ resource "aws_iam_role_policy" "codebuild" {
 
 resource "aws_codebuild_project" "this" {
   name         = "${local.project_name}"
-  description  = "Tag target repo when version is incremented in default branch"
+  description  = "Tag target repo when version is incremented in release branch"
   service_role = "${aws_iam_role.codebuild.arn}"
 
   artifacts {
@@ -86,6 +86,11 @@ resource "aws_codebuild_project" "this" {
     compute_type = "BUILD_GENERAL1_SMALL"
     image        = "aws/codebuild/nodejs:8.11.0"
     type         = "LINUX_CONTAINER"
+
+    environment_variable {
+      "name"  = "RELEASE_BRANCH"
+      "value" = "${var.release_branch}"
+    }
   }
 
   source {
@@ -105,12 +110,15 @@ locals {
           - which semver
       pre_build:
         commands:
+          - git config --global credential.helper '!aws codecommit credential-helper $@'
+          - git config --global credential.UseHttpPath true
+          - git checkout $RELEASE_BRANCH
+          - git branch
+          - git rev-parse HEAD
           - PRIOR_VERSION=$(eval "${var.prior_version_command}")
           - RELEASE_VERSION=$(eval "${var.release_version_command}")
           - echo PRIOR_VERSION="$PRIOR_VERSION"
           - echo RELEASE_VERSION="$RELEASE_VERSION"
-          - git branch
-          - git rev-parse HEAD
       build:
         commands:
           - |
@@ -120,8 +128,6 @@ locals {
             elif semver -r '>'"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null
             then
               echo "Releasing version $RELEASE_VERSION"
-              git config credential.helper '!aws codecommit credential-helper $@' || exit 1
-              git config credential.UseHttpPath true || exit 1
               git tag "$RELEASE_VERSION" || exit 1
               git push --tags || exit 1
             else
@@ -167,7 +173,7 @@ resource "aws_iam_role_policy" "events" {
 
 resource "aws_cloudwatch_event_rule" "this" {
   name        = "${local.project_name}"
-  description = "Tag target repo when version is incremented in default branch"
+  description = "Tag target repo when version is incremented in release branch"
 
   event_pattern = <<-PATTERN
     {
@@ -177,7 +183,7 @@ resource "aws_cloudwatch_event_rule" "this" {
         "event": ["referenceUpdated"],
         "repositoryName": ["${var.codecommit_repo_name}"],
         "referenceType": ["branch"],
-        "referenceName": ["${var.default_branch}"]
+        "referenceName": ["${var.release_branch}"]
       }
     }
     PATTERN
