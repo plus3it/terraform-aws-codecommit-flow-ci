@@ -101,7 +101,12 @@ resource "aws_codebuild_project" "this" {
 }
 
 locals {
-  buildspec = <<-BUILDSPEC
+  # Prepare the list of build_commands and release_commands for buildspec injection
+  build_commands   = "${join("", formatlist("      - %s\n", var.build_commands))}"
+  release_commands = "${join("", formatlist("          %s\n", var.release_commands))}"
+
+  # buildspec content before build_commands injection point
+  buildspec_build = <<-BUILDSPEC_BUILD
     version: 0.2
     phases:
       install:
@@ -121,19 +126,30 @@ locals {
           - echo RELEASE_VERSION="$RELEASE_VERSION"
       build:
         commands:
+    BUILDSPEC_BUILD
+
+  # buildspec content before release_command
+  buildspec_release = <<-BUILDSPEC_RELEASE
           - |
             if semver -r '<='"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null
             then
               echo "Version has not incremented, skipping release"
             elif semver -r '>'"$PRIOR_VERSION" "$RELEASE_VERSION" > /dev/null
             then
+    BUILDSPEC_RELEASE
+
+  # buildspec content *after* release_commands injection point
+  buildspec_post = <<-BUILDSPEC_POST
               echo "Releasing version $RELEASE_VERSION"
               git tag "$RELEASE_VERSION" || exit 1
               git push --tags || exit 1
             else
               echo "Unknown error occured" && exit 1
             fi
-    BUILDSPEC
+    BUILDSPEC_POST
+
+  # inject build_commands and release_commands into buildspec
+  buildspec = "${join("", compact(list(local.buildspec_build, local.build_commands, local.buildspec_release, local.release_commands, local.buildspec_post)))}"
 }
 
 # Cloudwatch Event Resources

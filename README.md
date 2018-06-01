@@ -16,12 +16,28 @@ a tag if the version has incremented.
 
 The version detection can be controlled through the variables:
 
-* `prior_version_command` - Command that returns the prior version
-* `release_version_command` - Command that returns the release version
+*   `prior_version_command` - Command that returns the prior version
+*   `release_version_command` - Command that returns the release version
 
-Versions are compared according to Semantic Versioning. If the prior_version
-command returns `1.0.0` and the release_version command returns `1.0.1`, then
-the tag `1.0.1` would be created on the default branch HEAD.
+Versions are compared according to Semantic Versioning. For example, if
+`prior_version_command` returns `1.0.0` and `release_version_command` returns
+`1.0.1`, then the tag `1.0.1` would be created on the `release_branch` HEAD.
+
+If you need to run any _build_ commands on _every_ update to the release
+branch, pass a list of commands in the `build_commands` variable. The commands
+will be injected into the buildspec, prior to testing whether the version has
+incremented.
+
+If you need to run any _release_ commands, **only** if the version has
+incremented, pass a list of commands in the `release_commands` variable. The
+commands will be injected into the buildspec, just prior to tagging the release
+branch. The _release_ commands execute _only_ in the case of a release, when
+the version has been incremented.
+
+The _release_ commands are executed inside a multi-line if statement, so if you
+need them to errexit on failure, append ` || exit $?` to the command in the
+`release_commands` list to force the shell to exit non-zero. This is not
+needed for `build_commands`; they always errexit.
 
 ```hcl
 module "codecommit-releases" {
@@ -31,6 +47,14 @@ module "codecommit-releases" {
   release_branch          = "master"
   prior_version_command   = "git describe --abbrev=0 --tags"
   release_version_command = "grep '^current_version' $CODEBUILD_SRC_DIR/.bumpversion.cfg | sed 's/^.*= //'"
+
+  build_commands = [
+    "echo foo"
+  ]
+
+  release_commands = [
+    "echo bar || exit $?"
+  ]
 }
 ```
 
