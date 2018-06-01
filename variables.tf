@@ -32,3 +32,9 @@ variable "release_commands" {
   description = "List of commands to execute only if the version has incremented, before tagging the release"
   default     = []
 }
+
+variable "iam_policies" {
+  type        = "list"
+  description = "List of IAM policiy ARNs to attached to the CodeBuild service role"
+  default     = []
+}
