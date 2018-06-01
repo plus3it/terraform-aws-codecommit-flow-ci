@@ -12,7 +12,7 @@ Event triggers the CodeBuild Project whenever the repo's release branch is
 updated (`referenceUpdated`). The CodeBuild Job checks the version, and creates
 a tag if the version has incremented.
 
-## Usage
+## Version detection
 
 The version detection can be controlled through the variables:
 
@@ -22,6 +22,8 @@ The version detection can be controlled through the variables:
 Versions are compared according to Semantic Versioning. For example, if
 `prior_version_command` returns `1.0.0` and `release_version_command` returns
 `1.0.1`, then the tag `1.0.1` would be created on the `release_branch` HEAD.
+
+## Running commands
 
 If you need to run any _build_ commands on _every_ update to the release
 branch, pass a list of commands in the `build_commands` variable. The commands
@@ -39,6 +41,19 @@ need them to errexit on failure, append ` || exit $?` to the command in the
 `release_commands` list to force the shell to exit non-zero. This is not
 needed for `build_commands`; they always errexit.
 
+## Attaching extra IAM policies
+
+The module creates a CodeBuild service role with an inline policy that has the
+minimum permissions needed to clone and push tags to the CodeCommit repo.
+However, commands specified using `build_commands` or `release_commands` may
+use additional AWS resources and require additional permissions. This use case
+can be addressed through the `iam_policies` variable. Create the IAM policies
+separately, and pass a list of policy ARNs through this variable. The policies
+will be attached to the CodeBuild service role, so the job will have the
+permissions needed by the extra commands.
+
+## Example
+
 ```hcl
 module "codecommit-releases" {
   source = "git::https://github.com/plus3it/terraform-aws-codecommit-releases.git"
@@ -54,6 +69,10 @@ module "codecommit-releases" {
 
   release_commands = [
     "echo bar || exit $?"
+  ]
+
+  iam_policies = [
+    "arn:aws:iam::<account>:policy/<policy-name>"
   ]
 }
 ```

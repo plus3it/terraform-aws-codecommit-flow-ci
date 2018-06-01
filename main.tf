@@ -73,6 +73,19 @@ resource "aws_iam_role_policy" "codebuild" {
   policy = "${data.aws_iam_policy_document.codebuild.json}"
 }
 
+data "aws_iam_policy" "codebuild" {
+  count = "${length(var.iam_policies)}"
+
+  arn = "${element(var.iam_policies, count.index)}"
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild" {
+  count = "${length(data.aws_iam_policy.codebuild.*.arn)}"
+
+  role       = "${aws_iam_role.codebuild.id}"
+  policy_arn = "${element(data.aws_iam_policy.codebuild.*.arn, count.index)}"
+}
+
 resource "aws_codebuild_project" "this" {
   name         = "${local.project_name}"
   description  = "Tag target repo when version is incremented in release branch"
