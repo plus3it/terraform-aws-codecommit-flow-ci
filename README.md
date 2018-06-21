@@ -266,15 +266,15 @@ invoked the function. These variables are available in the job environment, and
 so you may reference them from your buildspecs.
 
 *   `review`
-    -   `FLOW_PULL_REQUEST_ID`: ID of the pull request that triggered the event
-    -   `FLOW_PULL_REQUEST_SRC_COMMIT`: SHA of the source commit in the pull
+    *   `FLOW_PULL_REQUEST_ID`: ID of the pull request that triggered the event
+    *   `FLOW_PULL_REQUEST_SRC_COMMIT`: SHA of the source commit in the pull
         request
-    -   `FLOW_PULL_REQUEST_DST_COMMIT`: SHA of the destination commit (the
+    *   `FLOW_PULL_REQUEST_DST_COMMIT`: SHA of the destination commit (the
         target branch) in the pull request
 *   `branch`
-    -   `FLOW_BRANCH`: Name of the branch that triggered the event
+    *   `FLOW_BRANCH`: Name of the branch that triggered the event
 *   `tag`
-    -   `FLOW_TAG`: Name of the tag that triggered the event
+    *   `FLOW_TAG`: Name of the tag that triggered the event
 
 ## Builtin CodeBuild service role
 
