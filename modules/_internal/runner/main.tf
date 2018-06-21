@@ -49,6 +49,17 @@ locals {
 
 # IAM resources for CodeBuild
 
+data "template_file" "codebuild_policy_override" {
+  template = "${var.policy_override}"
+
+  vars {
+    repo_name  = "${var.repo_name}"
+    partition  = "${data.aws_partition.current.partition}"
+    region     = "${data.aws_region.current.name}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
+  }
+}
+
 data "aws_iam_policy_document" "codebuild_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -61,7 +72,7 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 }
 
 data "aws_iam_policy_document" "codebuild" {
-  override_json = "${var.policy_override}"
+  override_json = "${data.template_file.codebuild_policy_override.rendered}"
 
   statement {
     actions = [
