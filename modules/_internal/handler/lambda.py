@@ -66,6 +66,10 @@ def post_comment(params):
 
 def handle_codebuild_review_event(event):
     """Gather build details and post a comment to a managed pull request."""
+    red_square = 'https://via.placeholder.com/12/ff0000/000000?text=+'
+    green_square = 'https://via.placeholder.com/12/009926/000000?text=+'
+    blue_square = 'https://via.placeholder.com/12/0000ff/000000?text=+'
+
     event_details = event['detail']
     additional_information = event_details['additional-information']
     environment = additional_information['environment']
@@ -94,25 +98,36 @@ def handle_codebuild_review_event(event):
         build_status = event_details['build-status']
         region = event['region']
         request_token = build_arn + build_status
-
-        # Construct the comment based on the build status
-        comment = 'Build {} for project {} '.format(build_uuid, project_name)
-
-        build_status_map = {
-            'IN_PROGRESS': 'is **in progress**. ',
-            'SUCCEEDED': '**succeeded**! ',
-            'STOPPED': 'was **canceled**. ',
-            'TIMED_OUT': '**timed out**. '
-        }
-
-        comment += build_status_map.get(build_status, '**failed**.')
-
-        comment += (
-            'Visit the [AWS CodeBuild console](https://{0}.console.aws.amazon.'
-            'com/codebuild/home?region={0}#/builds/{1}/view/new) to view the '
-            'build details.'.format(
+        job_url = (
+            'https://{0}.console.aws.amazon.com/codebuild/home?region={0}#/'
+            'builds/{1}/view/new'.format(
                 region,
                 urllib.parse.quote(build_id, safe='~@#$&()*!+=:;,.?/\''))
+        )
+
+        # Construct the comment based on the build status
+        comment = 'Build `{0}` for project `{1}` '.format(
+            build_uuid, project_name)
+
+        build_status_map = {
+            'IN_PROGRESS': 'is [![blue]({0})]({1}) **IN PROGRESS**. '.format(
+                blue_square, job_url),
+            'SUCCEEDED': '[![green]({0})]({1}) **SUCCEEDED**! '.format(
+                green_square, job_url),
+            'STOPPED': 'was [![red]({0})]({1}) **CANCELED**. '.format(
+                red_square, job_url),
+            'TIMED_OUT': '[![red]({0})]({1}) **TIMED OUT**. '.format(
+                red_square, job_url)
+        }
+
+        comment += build_status_map.get(
+            build_status,
+            '[![red]({0})]({1}) **FAILED**. '.format(red_square, job_url)
+        )
+
+        comment += (
+            'Visit the [AWS CodeBuild console]({0}) to view the build '
+            'details.'.format(job_url)
         )
 
         # Add build logs to the comment for failed builds
