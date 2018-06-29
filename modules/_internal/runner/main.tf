@@ -39,10 +39,7 @@ locals {
 
 locals {
   # Process the buildspec input
-  default_buildspec = <<-BUILDSPEC
-    version: 0.2
-    phases: {}
-    BUILDSPEC
+  default_buildspec = "buildspec.yaml"
 
   buildspec = "${var.buildspec == "" ? local.default_buildspec : var.buildspec}"
 }
