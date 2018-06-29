@@ -144,8 +144,14 @@ locals {
 
 The `buildspec` variable object is a string that can be either a relative path
 in the repository to the buildspec file (e.g. `buildspec.yaml`), or a complete
-multi-line buildspec definition. The default is a multi-line buildspec that
-contains no commands and so actually does nothing.
+multi-line string buildspec specification.
+
+The default is the file `buildspec.yaml`, which would need to be present in
+the root of your CodeCommit repository. If the file is missing, the job will
+simply error.
+
+To use a multi-line string as a buildspec, see the example below. This
+specification contains no commands and so actually does nothing:
 
 ```hcl
 buildspec = <<-BUILDSPEC
