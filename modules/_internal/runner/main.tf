@@ -57,6 +57,19 @@ data "template_file" "codebuild_policy_override" {
   }
 }
 
+data "template_file" "policy_arns" {
+  count = "${length(var.policy_arns)}"
+
+  template = "${var.policy_arns[count.index]}"
+
+  vars {
+    repo_name  = "${var.repo_name}"
+    partition  = "${data.aws_partition.current.partition}"
+    region     = "${data.aws_region.current.name}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
+  }
+}
+
 data "aws_iam_policy_document" "codebuild_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -105,7 +118,7 @@ resource "aws_iam_role_policy" "codebuild" {
 data "aws_iam_policy" "codebuild" {
   count = "${length(var.policy_arns)}"
 
-  arn = "${element(var.policy_arns, count.index)}"
+  arn = "${data.template_file.policy_arns.*.rendered[count.index]}"
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild" {
