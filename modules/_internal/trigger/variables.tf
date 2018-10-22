@@ -21,4 +21,11 @@ variable "repo_name" {
 variable "event_pattern" {
   type        = "string"
   description = "CloudWatch Event pattern that triggers the CodeBuild job"
+  default     = ""
+}
+
+variable "schedule_expression" {
+  type        = "string"
+  description = "CloudWatch Event schedule that triggers the CodeBuild job"
+  default     = ""
 }

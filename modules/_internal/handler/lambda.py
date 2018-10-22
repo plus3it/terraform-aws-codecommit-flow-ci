@@ -226,6 +226,21 @@ def handle_codecommit_repository_event(event):
     start_build(params)
 
 
+def handle_cloudwatch_schedule_event(event):
+    """Gather event details and start CodeBuild job."""
+    params = {
+        'projectName': PROJECT_NAME,
+        'environmentVariablesOverride': [
+            {
+                'name': 'FLOW_SCHEDULE',
+                'value': event['time'],
+                'type': 'PLAINTEXT'
+            }
+        ]
+    }
+    start_build(params)
+
+
 def review_codebuild_event(event):
     """Determine whether this is a valid CodeBuild review event."""
     try:
@@ -302,6 +317,19 @@ def tag_repository_event(event):
     return False
 
 
+def schedule_cloudwatch_event(event):
+    """Determine whether this is a valid CloudWatch scheduled event."""
+    try:
+        source = event['source']
+        detail_type = event['detail-type']
+
+        return source == 'aws.events' and detail_type == 'Scheduled Event'
+    except KeyError as exc:
+        log.error('Caught error: %s', exc, exc_info=exc)
+
+    return False
+
+
 def review_handler(event, context):
     """Entry point for the lambda "review" handler."""
     try:
@@ -345,6 +373,21 @@ def tag_handler(event, context):
             handle_codecommit_repository_event(event)
         else:
             log.info('Not a CodeCommit tag event')
+    except Exception as exc:
+        log.critical('Caught error: %s', exc, exc_info=exc)
+        raise
+
+
+def schedule_handler(event, context):
+    """Entry point for the lambda "schedule" handler."""
+    try:
+        log.info('Received event:\n%s', dump_json(event))
+
+        if schedule_cloudwatch_event(event):
+            log.info('Handling valid CloudWatch schedule event...')
+            handle_cloudwatch_schedule_event(event)
+        else:
+            log.info('Not a CloudWatch schedule event')
     except Exception as exc:
         log.critical('Caught error: %s', exc, exc_info=exc)
         raise

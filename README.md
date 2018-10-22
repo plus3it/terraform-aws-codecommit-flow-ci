@@ -9,6 +9,7 @@ repositories. Fundamentally, we want to be able to trigger the CI system
 *   Pull request opened or source commit modified
 *   Branch HEAD modified
 *   Tag created or updated
+*   Scheduled build (e.g. "cron")
 
 All of the building blocks are there, pull requests, CloudWatch Events, etc,
 but understanding the event structures and linking the events to the CI system
@@ -27,6 +28,7 @@ There is a public module for each of the events mentioned above:
 *   [branch](modules/branch)
 *   [review](modules/review) -- i.e. the pull request event
 *   [tag](modules/tag)
+*   [schedule](modules/schedule)
 
 In general, each module sets up the following resources:
 
@@ -46,11 +48,12 @@ get updates on whether the CI passed/failed right within the pull request.
 
 ## A complete example workflow
 
-In this example, we setup the CI to execute automatically on three events:
+In this example, we setup the CI to execute automatically on four events:
 
 *   A pull request is opened or updated (`review` module)
 *   The `master` branch is updated (`branch` module)
 *   A tag is created or updated (`tag` module)
+*   A weekday schedule (`schedule` module)
 
 We have separate buildspecs for each event-type, and we keep those buildspecs
 together in the repository, in the `buildspecs` directory.
@@ -103,6 +106,15 @@ module "tag" {
   buildspec = "buildspecs/tag.yaml"
 }
 
+module "schedule" {
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git//modules/schedule"
+
+  repo_name = "foo"
+  buildspec = "buildspecs/schedule.yaml"
+
+  schedule_expression = "cron(0 11 ? * MON-FRI *)"
+}
+
 locals {
   branch_policy_override = <<-OVERRIDE
     {
@@ -139,6 +151,7 @@ locals {
 | `environment_variables` | List of environment variable map objects for the CodeBuild job | list of maps | `[]` |
 | `policy_arns` | List of IAM policy ARNs to attach to the CodeBuild service role | list | `[]` |
 | `policy_override` | IAM policy document in JSON that overrides/extends the builtin CodeBuild service role | string | `""` |
+| `schedule_expression` | CloudWatch Event schedule that triggers the CodeBuild job; used only be the `schedule` module | string | `""` |
 
 ### `buildspec` variable object
 
@@ -281,6 +294,8 @@ so you may reference them from your buildspecs.
     *   `FLOW_BRANCH`: Name of the branch that triggered the event
 *   `tag`
     *   `FLOW_TAG`: Name of the tag that triggered the event
+*   `schedule`
+    *   `FLOW_SCHEDULE`: Time associated with the scheduled event
 
 ## Builtin CodeBuild service role
 
@@ -313,7 +328,7 @@ statement {
 
 A default service role will be created for each Lambda function. The service
 role has just enough permissions to create and write to the function's
-CloudWatch Log Group, and to start the CodeBuild job. There are no users
+CloudWatch Log Group, and to start the CodeBuild job. There are no user
 variables exposed that extend or modify this role.
 
 ```hcl
