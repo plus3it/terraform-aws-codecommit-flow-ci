@@ -31,7 +31,7 @@ $(BIN_DIR):
 # $(call download_hashicorp_release,file,app,version)
 download_hashicorp_release = $(CURL) -o $(1) https://releases.hashicorp.com/$(2)/$(3)/$(2)_$(3)_$(OS)_$(ARCH).zip
 
-terraform/install: TERRAFORM_VERSION ?= $(shell $(CURL) https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
+terraform/install: TERRAFORM_VERSION ?= $(shell $(CURL) https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version' | sed 's/^v//')
 terraform/install: | $(BIN_DIR)
 	@ echo "[$@]: Installing $(@D)..."
 	$(call download_hashicorp_release,$(@D).zip,$(@D),$(TERRAFORM_VERSION))
