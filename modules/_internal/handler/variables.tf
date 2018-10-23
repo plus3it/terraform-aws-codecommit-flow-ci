@@ -1,6 +1,6 @@
 variable "handler" {
   type        = "string"
-  description = "Entry point for the lambda function. Must be one of: review_handler, branch_handler, tag_handler"
+  description = "Entry point for the lambda function. Must be one of: review_handler, branch_handler, tag_handler, schedule_handler"
 }
 
 variable "stage" {

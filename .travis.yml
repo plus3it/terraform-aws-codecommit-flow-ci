@@ -12,10 +12,10 @@ jobs:
     - stage: test
       env:
         - JOB="Terraform Format Verification"
-      before_script:
-        - make tf.tools
+      install:
+        - make terraform/install
       script:
-        - make tf.lint
+        - make terraform/lint
     - stage: deploy
       env:
         - JOB="Deploy to GitHub Releases"
