@@ -66,10 +66,6 @@ def post_comment(params):
 
 def handle_codebuild_review_event(event):
     """Gather build details and post a comment to a managed pull request."""
-    red_square = 'https://via.placeholder.com/12/ff0000/000000?text=+'
-    green_square = 'https://via.placeholder.com/12/009926/000000?text=+'
-    blue_square = 'https://via.placeholder.com/12/0000ff/000000?text=+'
-
     event_details = event['detail']
     additional_information = event_details['additional-information']
     environment = additional_information['environment']
@@ -105,24 +101,28 @@ def handle_codebuild_review_event(event):
                 urllib.parse.quote(build_id, safe='~@#$&()*!+=:;,.?/\''))
         )
 
-        # Construct the comment based on the build status
-        comment = 'Build `{0}` for project `{1}` '.format(
-            build_uuid, project_name)
+        # Construct the base comment on the build status
+        comment_base = 'Build `{0}` for project `{1}` {2}'
+
+        badge_link = (
+            '![{0}](https://s3.{1}.amazonaws.com/'
+            'codefactory-{1}-prod-default-build-badges/{0}.svg "{0}")')
 
         build_status_map = {
-            'IN_PROGRESS': 'is [![blue]({0})]({1}) **IN PROGRESS**. '.format(
-                blue_square, job_url),
-            'SUCCEEDED': '[![green]({0})]({1}) **SUCCEEDED**! '.format(
-                green_square, job_url),
-            'STOPPED': 'was [![red]({0})]({1}) **CANCELED**. '.format(
-                red_square, job_url),
-            'TIMED_OUT': '[![red]({0})]({1}) **TIMED OUT**. '.format(
-                red_square, job_url)
+            'IN_PROGRESS': ('inProgress', 'is **IN PROGRESS**. '),
+            'SUCCEEDED': ('passing', '**SUCCEEDED**! '),
+            'STOPPED': ('failing', 'was **CANCELED**. '),
+            'TIMED_OUT': ('failing', '**TIMED OUT**. '),
         }
 
-        comment += build_status_map.get(
-            build_status,
-            '[![red]({0})]({1}) **FAILED**. '.format(red_square, job_url)
+        comment_details = build_status_map.get(
+            build_status, ('failing', '**FAILED**. '))
+
+        # Comment is in the form:
+        #   '<badge>\n\n<comment_base> <status_msg>'
+        comment = '{0}\n\n{1}'.format(
+            badge_link.format(comment_details[0], region),
+            comment_base.format(build_uuid, project_name, comment_details[1])
         )
 
         comment += (
