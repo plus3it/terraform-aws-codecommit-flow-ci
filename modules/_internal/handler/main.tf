@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "lambda" {
 }
 
 module "handler" {
-  source = "git::https://github.com/plus3it/terraform-aws-lambda.git?ref=v0.11.4"
+  source = "git::https://github.com/plus3it/terraform-aws-lambda.git?ref=v0.12.0"
 
   function_name = "${local.name_slug}"
   description   = "${var.stage_description}"
