@@ -98,7 +98,7 @@ module "branch" {
   branch    = "master"
   buildspec = "buildspecs/master.yaml"
 
-  policy_override = "${local.branch_policy_override}"
+  policy_override = local.branch_policy_override
 }
 
 module "tag" {

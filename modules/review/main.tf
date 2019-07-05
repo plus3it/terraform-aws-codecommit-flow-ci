@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 data "aws_partition" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -46,59 +50,59 @@ module "handler" {
   source = "../_internal/handler"
 
   handler                = "review_handler"
-  stage                  = "${local.stage}"
-  stage_description      = "${local.stage_description}"
-  repo_name              = "${var.repo_name}"
-  project_arn            = "${module.runner.codebuild_project_arn}"
-  lambda_policy_override = "${data.aws_iam_policy_document.handler.json}"
+  stage                  = local.stage
+  stage_description      = local.stage_description
+  repo_name              = var.repo_name
+  project_arn            = module.runner.codebuild_project_arn
+  lambda_policy_override = data.aws_iam_policy_document.handler.json
 }
 
 module "runner" {
   source = "../_internal/runner"
 
-  stage                 = "${local.stage}"
-  stage_description     = "${local.stage_description}"
-  repo_name             = "${var.repo_name}"
-  buildspec             = "${var.buildspec}"
-  artifacts             = "${var.artifacts}"
-  environment           = "${var.environment}"
-  environment_variables = "${var.environment_variables}"
-  policy_override       = "${var.policy_override}"
-  policy_arns           = "${var.policy_arns}"
+  stage                 = local.stage
+  stage_description     = local.stage_description
+  repo_name             = var.repo_name
+  buildspec             = var.buildspec
+  artifacts             = var.artifacts
+  environment           = var.environment
+  environment_variables = var.environment_variables
+  policy_override       = var.policy_override
+  policy_arns           = var.policy_arns
 }
 
 module "trigger_pull_request" {
   source = "../_internal/trigger"
 
   stage             = "${local.stage}-pull-request"
-  stage_description = "${local.stage_description}"
-  target_arn        = "${module.handler.function_arn}"
-  repo_name         = "${var.repo_name}"
-  event_pattern     = "${local.event_pattern_pull_request}"
+  stage_description = local.stage_description
+  target_arn        = module.handler.function_arn
+  repo_name         = var.repo_name
+  event_pattern     = local.event_pattern_pull_request
 }
 
 module "trigger_codebuild" {
   source = "../_internal/trigger"
 
   stage             = "${local.stage}-codebuild"
-  stage_description = "${local.stage_description}"
-  target_arn        = "${module.handler.function_arn}"
-  repo_name         = "${var.repo_name}"
-  event_pattern     = "${local.event_pattern_codebuild}"
+  stage_description = local.stage_description
+  target_arn        = module.handler.function_arn
+  repo_name         = var.repo_name
+  event_pattern     = local.event_pattern_codebuild
 }
 
 resource "aws_lambda_permission" "trigger_pull_request" {
   action        = "lambda:InvokeFunction"
-  function_name = "${module.handler.function_name}"
+  function_name = module.handler.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = "${module.trigger_pull_request.events_rule_arn}"
+  source_arn    = module.trigger_pull_request.events_rule_arn
 }
 
 resource "aws_lambda_permission" "trigger_codebuild" {
   action        = "lambda:InvokeFunction"
-  function_name = "${module.handler.function_name}"
+  function_name = module.handler.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = "${module.trigger_codebuild.events_rule_arn}"
+  source_arn    = module.trigger_codebuild.events_rule_arn
 }
 
 # IAM policy documents
@@ -106,11 +110,11 @@ resource "aws_lambda_permission" "trigger_codebuild" {
 data "aws_iam_policy_document" "handler" {
   statement {
     actions   = ["codecommit:PostCommentForPullRequest"]
-    resources = ["${local.repo_arn}"]
+    resources = [local.repo_arn]
   }
 
   statement {
     actions   = ["logs:GetLogEvents"]
-    resources = ["${local.codebuild_log_stream_arn}"]
+    resources = [local.codebuild_log_stream_arn]
   }
 }
