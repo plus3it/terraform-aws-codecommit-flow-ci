@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 data "aws_partition" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -19,13 +23,7 @@ locals {
     type         = "LINUX_CONTAINER"
   }
 
-  # hack: <https://github.com/hashicorp/terraform/issues/12453#issuecomment-378033384>
-  environment_variables = {
-    empty     = "${map()}"
-    not_empty = "${map("environment_variable", var.environment_variables)}"
-  }
-
-  environment = "${merge(local.default_environment, var.environment, local.environment_variables[length(var.environment_variables) > 0 ? "not_empty" : "empty"])}"
+  environment = merge(local.default_environment, var.environment)
 }
 
 locals {
@@ -34,39 +32,39 @@ locals {
     type = "NO_ARTIFACTS"
   }
 
-  artifacts = "${merge(local.default_artifacts, var.artifacts)}"
+  artifacts = merge(local.default_artifacts, var.artifacts)
 }
 
 locals {
   # Process the buildspec input
   default_buildspec = "buildspec.yaml"
 
-  buildspec = "${var.buildspec == "" ? local.default_buildspec : var.buildspec}"
+  buildspec = var.buildspec == "" ? local.default_buildspec : var.buildspec
 }
 
 # IAM resources for CodeBuild
 
 data "template_file" "codebuild_policy_override" {
-  template = "${var.policy_override}"
+  template = var.policy_override
 
-  vars {
-    repo_name  = "${var.repo_name}"
-    partition  = "${data.aws_partition.current.partition}"
-    region     = "${data.aws_region.current.name}"
-    account_id = "${data.aws_caller_identity.current.account_id}"
+  vars = {
+    repo_name  = var.repo_name
+    partition  = data.aws_partition.current.partition
+    region     = data.aws_region.current.name
+    account_id = data.aws_caller_identity.current.account_id
   }
 }
 
 data "template_file" "policy_arns" {
-  count = "${length(var.policy_arns)}"
+  count = length(var.policy_arns)
 
-  template = "${var.policy_arns[count.index]}"
+  template = var.policy_arns[count.index]
 
-  vars {
-    repo_name  = "${var.repo_name}"
-    partition  = "${data.aws_partition.current.partition}"
-    region     = "${data.aws_region.current.name}"
-    account_id = "${data.aws_caller_identity.current.account_id}"
+  vars = {
+    repo_name  = var.repo_name
+    partition  = data.aws_partition.current.partition
+    region     = data.aws_region.current.name
+    account_id = data.aws_caller_identity.current.account_id
   }
 }
 
@@ -82,7 +80,7 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 }
 
 data "aws_iam_policy_document" "codebuild" {
-  override_json = "${data.template_file.codebuild_policy_override.rendered}"
+  override_json = data.template_file.codebuild_policy_override.rendered
 
   statement {
     actions = [
@@ -92,54 +90,86 @@ data "aws_iam_policy_document" "codebuild" {
     ]
 
     resources = [
-      "${local.log_group_arn}",
+      local.log_group_arn,
       "${local.log_group_arn}:*",
     ]
   }
 
   statement {
     actions   = ["codecommit:GitPull"]
-    resources = ["${local.repo_arn}"]
+    resources = [local.repo_arn]
   }
 }
 
 resource "aws_iam_role" "codebuild" {
   name_prefix        = "flow-ci-codebuild-service-role-"
   description        = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
-  assume_role_policy = "${data.aws_iam_policy_document.codebuild_assume_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
 }
 
 resource "aws_iam_role_policy" "codebuild" {
   name   = "${local.name_slug}-codebuild"
-  role   = "${aws_iam_role.codebuild.id}"
-  policy = "${data.aws_iam_policy_document.codebuild.json}"
+  role   = aws_iam_role.codebuild.id
+  policy = data.aws_iam_policy_document.codebuild.json
 }
 
 data "aws_iam_policy" "codebuild" {
-  count = "${length(var.policy_arns)}"
+  count = length(var.policy_arns)
 
-  arn = "${data.template_file.policy_arns.*.rendered[count.index]}"
+  arn = data.template_file.policy_arns[count.index].rendered
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild" {
-  count = "${length(data.aws_iam_policy.codebuild.*.arn)}"
+  count = length(data.aws_iam_policy.codebuild.*.arn)
 
-  role       = "${aws_iam_role.codebuild.id}"
-  policy_arn = "${element(data.aws_iam_policy.codebuild.*.arn, count.index)}"
+  role       = aws_iam_role.codebuild.id
+  policy_arn = element(data.aws_iam_policy.codebuild.*.arn, count.index)
 }
 
 # CodeBuild Resources
 
 resource "aws_codebuild_project" "this" {
-  name         = "${local.name_slug}"
-  description  = "${var.stage_description}"
-  service_role = "${aws_iam_role.codebuild.arn}"
-  artifacts    = ["${local.artifacts}"]
-  environment  = ["${local.environment}"]
+  name         = local.name_slug
+  description  = var.stage_description
+  service_role = aws_iam_role.codebuild.arn
+
+  dynamic "artifacts" {
+    for_each = [local.artifacts]
+    content {
+      encryption_disabled = lookup(artifacts.value, "encryption_disabled", null)
+      location            = lookup(artifacts.value, "location", null)
+      name                = lookup(artifacts.value, "name", null)
+      namespace_type      = lookup(artifacts.value, "namespace_type", null)
+      packaging           = lookup(artifacts.value, "packaging", null)
+      path                = lookup(artifacts.value, "path", null)
+      type                = artifacts.value.type
+    }
+  }
+
+  dynamic "environment" {
+    for_each = [local.environment]
+    content {
+      certificate                 = lookup(environment.value, "certificate", null)
+      compute_type                = environment.value.compute_type
+      image                       = environment.value.image
+      image_pull_credentials_type = lookup(environment.value, "image_pull_credentials_type", null)
+      privileged_mode             = lookup(environment.value, "privileged_mode", null)
+      type                        = environment.value.type
+
+      dynamic "environment_variable" {
+        for_each = var.environment_variables
+        content {
+          name  = environment_variable.value.name
+          type  = lookup(environment_variable.value, "type", null)
+          value = environment_variable.value.value
+        }
+      }
+    }
+  }
 
   source {
     type      = "CODECOMMIT"
-    location  = "${local.repo_url}"
-    buildspec = "${local.buildspec}"
+    location  = local.repo_url
+    buildspec = local.buildspec
   }
 }
