@@ -16,6 +16,7 @@ variable "repo_name" {
 variable "buildspec" {
   type        = string
   description = "Buildspec used when the release branch is updated"
+  default     = null
 }
 
 variable "artifacts" {

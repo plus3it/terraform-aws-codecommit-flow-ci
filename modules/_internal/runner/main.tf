@@ -35,13 +35,6 @@ locals {
   artifacts = merge(local.default_artifacts, var.artifacts)
 }
 
-locals {
-  # Process the buildspec input
-  default_buildspec = "buildspec.yaml"
-
-  buildspec = var.buildspec == "" ? local.default_buildspec : var.buildspec
-}
-
 # IAM resources for CodeBuild
 
 data "template_file" "codebuild_policy_override" {
@@ -170,6 +163,6 @@ resource "aws_codebuild_project" "this" {
   source {
     type      = "CODECOMMIT"
     location  = local.repo_url
-    buildspec = local.buildspec
+    buildspec = var.buildspec
   }
 }
