@@ -11,3 +11,10 @@ __pycache__
 .env
 .private
 *.tfvars
+
+# tardigrade-ci
+.tardigrade-ci
+tardigrade-ci/
+
+# eclint
+.git/

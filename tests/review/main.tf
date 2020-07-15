@@ -6,7 +6,7 @@ module "test_review" {
   badge_enabled  = true
   build_timeout  = 20
   queued_timeout = 60
-  tags           = {
+  tags = {
     Test = "True"
   }
 

@@ -1,41 +1,41 @@
-language: bash
+dist: bionic
 
-env:
-  global:
-    - REPO="${TRAVIS_REPO_SLUG#*/}"
-    - OWNER=plus3it
-    - DEPLOY_SLUG=$OWNER/$REPO
-    - TF_INPUT=0
+language: node_js
+
+node_js:
+  - "12"
+
+stages:
+  - lint
+  - deploy
 
 jobs:
   include:
-    - stage: test
-      env:
-        - JOB="Terraform Format Verification"
-      install:
-        - make terraform/install
-      script:
-        - make terraform/lint
+    - stage: lint
+      name: Project Syntax Verification
+      script: make && make docker/run target=lint
     - stage: deploy
-      env:
-        - JOB="Deploy to GitHub Releases"
-        - PRIOR_VERSION=$(git describe --abbrev=0 --tags)
-        - RELEASE_VERSION=$(grep '^current_version' $TRAVIS_BUILD_DIR/.bumpversion.cfg | sed 's/^.*= //')
-        - RELEASE_BODY="* [$REPO v$RELEASE_VERSION changes](https://github.com/$OWNER/$REPO/compare/$PRIOR_VERSION...$RELEASE_VERSION)"
+      if: branch = master AND type = push AND repo = plus3it/terraform-aws-codecommit-flow-ci
+      before_script:
+        - |
+          PRIOR_VERSION=$(git describe --abbrev=0 --tags)
+          RELEASE_VERSION=$(grep current_version $TRAVIS_BUILD_DIR/.bumpversion.cfg | sed 's/^.*= //' )
+          RELEASE_BODY="* [terraform-aws-codecommit-flow-ci v$RELEASE_VERSION CHANGELOG](https://github.com/plus3it/terraform-aws-codecommit-flow-ci/blob/$RELEASE_VERSION/CHANGELOG.md)"
+          export PRIOR_VERSION RELEASE_VERSION RELEASE_BODY
       script: skip
       before_deploy:
-        - echo PRIOR_VERSION = $PRIOR_VERSION
-        - echo RELEASE_VERSION = $RELEASE_VERSION
-        - echo RELEASE_BODY = $RELEASE_BODY
+        - |
+          (set -x; git tag -a $RELEASE_VERSION -m $RELEASE_VERSION)
       deploy:
         provider: releases
-        name: $RELEASE_VERSION
-        tag_name: $RELEASE_VERSION
-        body: $RELEASE_BODY
-        draft: false
         api_key:
           secure: XF3KUqRXgFk118a8cUYbxKNvX7AiahKmsui0tSOs1fpKxkrQhp4UM7/lECB3qn/LqCwF9iDKpUD3MOr40aFkqCC1/dmQx4GO54GqBPg52/pOGppeJr5oYPE3A7YrydEIQpkP/GtvfpyFu0bAHonOPlkw+hHjJVy9Wj0se6JBcKKCShKIgtRiWPj5xAAH+xe9L6hfAUlZGaZhx+bq3OrLgAtuKXoGppBqVM13oTkk3XZQB4ps6QbBWFSSy8G10kJc6zuZ4dicZE9xC28fyocoOqHy+1r2vhhi6HF3MIJVsYofveeXrStdnNcuuF25stserIHbvSpB2DK9e7K3QVouf977DtOyzU4AvK28KmVu3BU712mG1eWRigyQsZ3hYRYqxDIx/HT/ueRz/s/FrI6EPI+a5gG4WCN2xDNY9DUuaR00Xpq/x33mqLjr36wCTOUaSw7b+CPzZyq7cOUGMZHfCG/kFSXCWio1wlvQ2TzDnUHSqgDCpkCQX4wcCbQavG4OhO7UDGMQ6N/X2mVvJ9rfylbTWJ06zFbvacC71neYqxMriK2XLY2nQduxsC7dqzrAI+jhXhbvBE3L4VTDs9EuJU4q82eCITkqF3qpni8jopzN4YKpBjhGQrarM9hqd2EhE4YAt7BYjBJF/boWhvKcgYygrRu1883M2gn9Afk0wBY=
+        name: $RELEASE_VERSION
+        body: $RELEASE_BODY
+        tag_name: $RELEASE_VERSION
+        target_commitish: $TRAVIS_COMMIT
+        draft: false
         on:
           branch: master
-          repo: $DEPLOY_SLUG
+          repo: plus3it/terraform-aws-codecommit-flow-ci
           condition: '"$PRIOR_VERSION" != "$RELEASE_VERSION"'
