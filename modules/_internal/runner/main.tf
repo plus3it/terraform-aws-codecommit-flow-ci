@@ -126,6 +126,13 @@ resource "aws_codebuild_project" "this" {
   description  = var.stage_description
   service_role = aws_iam_role.codebuild.arn
 
+  badge_enabled  = var.badge_enabled
+  build_timeout  = var.build_timeout
+  queued_timeout = var.queued_timeout
+  encryption_key = var.encryption_key
+  source_version = var.source_version
+  tags           = var.tags
+
   dynamic "artifacts" {
     for_each = [local.artifacts]
     content {
