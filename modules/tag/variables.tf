@@ -9,6 +9,40 @@ variable "buildspec" {
   default     = ""
 }
 
+variable "badge_enabled" {
+  type        = bool
+  description = "Generates a publicly-accessible URL for the projects build badge"
+  default     = null
+}
+
+variable "build_timeout" {
+  type        = number
+  description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
+  default     = null
+}
+
+variable "queued_timeout" {
+  type        = number
+  description = "How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out"
+  default     = null
+}
+variable "encryption_key" {
+  type        = string
+  description = "The AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts"
+  default     = null
+}
+variable "source_version" {
+  type        = string
+  description = "A version of the build input to be built for this project. If not specified, the latest version is used"
+  default     = null
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to assign to the resource"
+  default     = {}
+}
+
 variable "artifacts" {
   type        = map(string)
   description = "Map defining an artifacts object for the CodeBuild job"

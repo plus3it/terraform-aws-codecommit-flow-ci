@@ -141,20 +141,6 @@ locals {
 }
 ```
 
-## Variables
-
-| Name | Description | Type | Default |
-|------|-------------|:----:|:-------:|
-| `repo_name` | Name of the CodeCommit repository | string | - |
-| `branch` | Name of the branch that will trigger a build; used only by the `branch` module | string | `master` |
-| `buildspec` | Buildspec used by the CodeBuild job; may be a relative path to a file, or a complete buildspec as a multi-line string | string | `""` |
-| `artifacts` | Map defining the artifacts object for the CodeBuild job | map | `{}` |
-| `environment` | Map defining the environment object for the CodeBuild job | map | `{}` |
-| `environment_variables` | List of environment variable map objects for the CodeBuild job | list of maps | `[]` |
-| `policy_arns` | List of IAM policy ARNs to attach to the CodeBuild service role | list | `[]` |
-| `policy_override` | IAM policy document in JSON that overrides/extends the builtin CodeBuild service role | string | `""` |
-| `schedule_expression` | CloudWatch Event schedule that triggers the CodeBuild job; used only be the `schedule` module | string | `""` |
-
 ### `buildspec` variable object
 
 The `buildspec` variable object is a string that can be either a relative path

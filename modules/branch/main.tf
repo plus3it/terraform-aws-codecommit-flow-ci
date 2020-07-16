@@ -50,6 +50,13 @@ module "runner" {
   environment_variables = var.environment_variables
   policy_override       = var.policy_override
   policy_arns           = var.policy_arns
+
+  badge_enabled  = var.badge_enabled
+  build_timeout  = var.build_timeout
+  queued_timeout = var.queued_timeout
+  encryption_key = var.encryption_key
+  source_version = var.source_version
+  tags           = var.tags
 }
 
 module "trigger" {
