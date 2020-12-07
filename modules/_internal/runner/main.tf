@@ -113,7 +113,7 @@ data "aws_iam_policy" "codebuild" {
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild" {
-  count = length(data.aws_iam_policy.codebuild.*.arn)
+  count = length(var.policy_arns)
 
   role       = aws_iam_role.codebuild.id
   policy_arn = element(data.aws_iam_policy.codebuild.*.arn, count.index)
