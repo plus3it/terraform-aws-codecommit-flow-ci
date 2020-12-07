@@ -50,6 +50,9 @@ func TestModule(t *testing.T) {
 					terraformOptions := createTerraformOptions(f.Name())
 					defer terraform.Destroy(t, terraformOptions)
 					terraform.InitAndApply(t, terraformOptions)
+
+					// run terraform apply a second time to detect issues with follow-on plan
+					terraform.Apply(t, terraformOptions)
 				})
 			}
 		}
