@@ -65,7 +65,7 @@ def post_comment(params):
     return response
 
 
-def handle_codebuild_review_event(event):
+def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
     """Gather build details and post a comment to a managed pull request."""
     event_details = event["detail"]
     additional_information = event_details["additional-information"]
@@ -153,16 +153,13 @@ def handle_codebuild_review_event(event):
                 "startFromHead": False,
             }
 
-            try:
-                log.info("Sending request for CloudWatch Log events...")
-                log.debug("GetLogEvents params:\n%s", log_params)
-                response = cloudwatchlogs.get_log_events(**log_params)
-                log.info("CloudWatch Log request succeeded!")
-                log.debug("GetLogEvents response:\n%s", response)
-                log_messages = [event["message"] for event in response["events"]]
-                comment += "\n```\n{}\n```\n".format("".join(log_messages))
-            except Exception as exc:
-                log.error("Caught error: %s", exc, exc_info=exc)
+            log.info("Sending request for CloudWatch Log events...")
+            log.debug("GetLogEvents params:\n%s", log_params)
+            response = cloudwatchlogs.get_log_events(**log_params)
+            log.info("CloudWatch Log request succeeded!")
+            log.debug("GetLogEvents response:\n%s", response)
+            log_messages = [event["message"] for event in response["events"]]
+            comment += "\n```\n{}\n```\n".format("".join(log_messages))
 
         pull_request_params = {
             "repositoryName": repo_name,
@@ -324,7 +321,7 @@ def schedule_cloudwatch_event(event):
     return False
 
 
-def review_handler(event, context):
+def review_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "review" handler."""
     try:
         log.info("Received event:\n%s", dump_json(event))
@@ -342,7 +339,7 @@ def review_handler(event, context):
         raise
 
 
-def branch_handler(event, context):
+def branch_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "branch" handler."""
     try:
         log.info("Received event:\n%s", dump_json(event))
@@ -357,7 +354,7 @@ def branch_handler(event, context):
         raise
 
 
-def tag_handler(event, context):
+def tag_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "tag" handler."""
     try:
         log.info("Received event:\n%s", dump_json(event))
@@ -372,7 +369,7 @@ def tag_handler(event, context):
         raise
 
 
-def schedule_handler(event, context):
+def schedule_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "schedule" handler."""
     try:
         log.info("Received event:\n%s", dump_json(event))
