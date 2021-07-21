@@ -25,7 +25,8 @@ course for each CodeBuild project you can specify a different buildspec.
 
 ## Public modules
 
-There is a public module for each of the events mentioned above:
+The top-level module is a wrapper around each of the "event" modules. There is
+also a public module for each of the events mentioned above:
 
 *   [branch](modules/branch)
 *   [review](modules/review) -- i.e. the pull request event
@@ -85,15 +86,17 @@ might do in this case:
 
 ```hcl
 module "review" {
-  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git//modules/review"
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git"
 
+  event     = "review"
   repo_name = "foo"
   buildspec = "buildspecs/review.yaml"
 }
 
 module "branch" {
-  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git//modules/branch"
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git"
 
+  event     = "branch"
   repo_name = "foo"
   branch    = "master"
   buildspec = "buildspecs/master.yaml"
@@ -102,15 +105,17 @@ module "branch" {
 }
 
 module "tag" {
-  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git//modules/tag"
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git"
 
+  event     = "tag"
   repo_name = "foo"
   buildspec = "buildspecs/tag.yaml"
 }
 
 module "schedule" {
-  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git//modules/schedule"
+  source = "git::https://github.com/plus3it/terraform-aws-codecommit-flow-ci.git"
 
+  event     = "schedule"
   repo_name = "foo"
   buildspec = "buildspecs/schedule.yaml"
 
