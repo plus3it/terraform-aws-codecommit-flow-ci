@@ -158,7 +158,7 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
             log.info("CloudWatch Log request succeeded!")
             log.debug("GetLogEvents response:\n%s", response)
             log_messages = [event["message"] for event in response["events"]]
-            comment += "\n```\n{''.join(log_messages)}\n```\n"
+            comment += f"\n```\n{''.join(log_messages)}\n```\n"
 
         pull_request_params = {
             "repositoryName": repo_name,
