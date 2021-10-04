@@ -98,21 +98,13 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
         build_status = event_details["build-status"]
         region = event["region"]
         request_token = build_arn + build_status
+        safe_build_id = urllib.parse.quote(build_id, safe="~@#$&()*!+=:;,.?/'")
         job_url = (
-            "https://{0}.console.aws.amazon.com/codebuild/home?region={0}#/"
-            "builds/{1}/view/new".format(
-                region, urllib.parse.quote(build_id, safe="~@#$&()*!+=:;,.?/'")
-            )
+            f"https://{region}.console.aws.amazon.com/codebuild/home?"
+            f"region={region}#/builds/{safe_build_id}/view/new"
         )
 
         # Construct the base comment on the build status
-        comment_base = "Build `{0}` for project `{1}` {2}"
-
-        badge_link = (
-            "![{0}](https://s3.{1}.amazonaws.com/"
-            'codefactory-{1}-prod-default-build-badges/{0}.svg "{0}")'
-        )
-
         build_status_map = {
             "IN_PROGRESS": ("inProgress", "is **IN PROGRESS**. "),
             "SUCCEEDED": ("passing", "**SUCCEEDED**! "),
@@ -124,16 +116,23 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
             build_status, ("failing", "**FAILED**. ")
         )
 
-        # Comment is in the form:
-        #   '<badge>\n\n<comment_base> <status_msg>'
-        comment = "{0}\n\n{1}".format(
-            badge_link.format(comment_details[0], region),
-            comment_base.format(build_uuid, project_name, comment_details[1]),
+        badge_link = (
+            f"![{comment_details[0]}](https://s3.{region}.amazonaws.com/"
+            f"codefactory-{region}-prod-default-build-badges/"
+            f'{comment_details[0]}.svg "{comment_details[0]}")'
         )
 
+        comment_base = (
+            f"Build `{build_uuid}` for project `{project_name}` {comment_details[1]}"
+        )
+
+        # Comment is in the form:
+        #   '<badge>\n\n<comment_base> <status_msg>'
+        comment = f"{badge_link}\n\n{comment_base}"
+
         comment += (
-            "Visit the [AWS CodeBuild console]({0}) to view the build "
-            "details.".format(job_url)
+            f"Visit the [AWS CodeBuild console]({job_url}) to view the build "
+            f"details."
         )
 
         # Add build logs to the comment for failed builds
@@ -159,7 +158,7 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
             log.info("CloudWatch Log request succeeded!")
             log.debug("GetLogEvents response:\n%s", response)
             log_messages = [event["message"] for event in response["events"]]
-            comment += "\n```\n{}\n```\n".format("".join(log_messages))
+            comment += f"\n```\n{''.join(log_messages)}\n```\n"
 
         pull_request_params = {
             "repositoryName": repo_name,
