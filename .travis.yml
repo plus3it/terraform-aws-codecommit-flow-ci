@@ -1,9 +1,6 @@
-dist: bionic
+dist: focal
 
-language: node_js
-
-node_js:
-  - "12"
+language: minimal
 
 stages:
   - lint
@@ -15,7 +12,7 @@ jobs:
   include:
     - stage: lint
       name: Project Syntax Verification
-      script: make && make docker/run target=lint
+      script: make docker/run target=lint
     - stage: deploy
       if: branch = master AND type = push AND repo = plus3it/terraform-aws-codecommit-flow-ci
       before_script:
