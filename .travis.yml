@@ -10,12 +10,12 @@ stages:
 if: branch = master OR type = pull_request
 
 before_install:
-   - tmpdaemon=$(mktemp)
-   - sudo jq '."registry-mirrors" += ["https://mirror.gcr.io"]' /etc/docker/daemon.json > "$tmpdaemon"
-   - sudo mv "$tmpdaemon" /etc/docker/daemon.json
-   - sudo systemctl daemon-reload
-   - sudo systemctl restart docker
-   - docker system info
+  - tmpdaemon=$(mktemp)
+  - sudo jq '."registry-mirrors" += ["https://mirror.gcr.io"]' /etc/docker/daemon.json > "$tmpdaemon"
+  - sudo mv "$tmpdaemon" /etc/docker/daemon.json
+  - sudo systemctl daemon-reload
+  - sudo systemctl restart docker
+  - docker system info
 
 jobs:
   include:
