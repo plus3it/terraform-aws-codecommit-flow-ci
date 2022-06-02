@@ -8,7 +8,7 @@ locals {
 }
 
 data "aws_iam_policy_document" "lambda" {
-  override_json = var.lambda_policy_override
+  override_policy_documents = compact([var.lambda_policy_override])
 
   statement {
     actions   = ["codebuild:StartBuild"]
