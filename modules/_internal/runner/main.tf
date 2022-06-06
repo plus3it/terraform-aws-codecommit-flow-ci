@@ -172,4 +172,8 @@ resource "aws_codebuild_project" "this" {
     location  = local.repo_url
     buildspec = var.buildspec
   }
+
+  lifecycle {
+    ignore_changes = [project_visibility]
+  }
 }
