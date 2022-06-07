@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 }
 
 data "aws_iam_policy_document" "codebuild" {
-  override_json = data.template_file.codebuild_policy_override.rendered
+  override_policy_documents = compact([data.template_file.codebuild_policy_override.rendered])
 
   statement {
     actions = [
