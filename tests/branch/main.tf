@@ -30,6 +30,38 @@ module "test_branch" {
     OVERRIDE
 }
 
+module "test_branch2" {
+  source = "../..//modules/branch"
+
+  repo_name = local.repo_name
+  branch    = "test/dev"
+
+  environment = {
+    compute_type = "BUILD_GENERAL1_LARGE"
+  }
+
+  policy_override = <<-OVERRIDE
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": "codecommit:GitPush",
+                "Condition": {
+                    "StringLikeIfExists": {
+                        "codecommit:References": [
+                            "refs/tags/*"
+                        ]
+                    }
+                },
+                "Effect": "Allow",
+                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.repo_name}",
+                "Sid": ""
+            }
+        ]
+    }
+    OVERRIDE
+}
+
 locals {
   repo_name = "test-branch-flow-ci"
 }
