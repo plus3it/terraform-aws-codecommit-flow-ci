@@ -37,30 +37,6 @@ locals {
 
 # IAM resources for CodeBuild
 
-data "template_file" "codebuild_policy_override" {
-  template = var.policy_override
-
-  vars = {
-    repo_name  = var.repo_name
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
-  }
-}
-
-data "template_file" "policy_arns" {
-  count = length(var.policy_arns)
-
-  template = var.policy_arns[count.index]
-
-  vars = {
-    repo_name  = var.repo_name
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
-  }
-}
-
 data "aws_iam_policy_document" "codebuild_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -73,7 +49,12 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 }
 
 data "aws_iam_policy_document" "codebuild" {
-  override_policy_documents = compact([data.template_file.codebuild_policy_override.rendered])
+  override_json = templatefile(var.policy_override, {
+    repo_name  = var.repo_name
+    partition  = data.aws_partition.current.partition
+    region     = data.aws_region.current.name
+    account_id = data.aws_caller_identity.current.account_id
+  })
 
   statement {
     actions = [
@@ -109,7 +90,12 @@ resource "aws_iam_role_policy" "codebuild" {
 data "aws_iam_policy" "codebuild" {
   count = length(var.policy_arns)
 
-  arn = data.template_file.policy_arns[count.index].rendered
+  arn = templatefile(var.policy_arns[count.index], {
+    repo_name  = var.repo_name
+    partition  = data.aws_partition.current.partition
+    region     = data.aws_region.current.name
+    account_id = data.aws_caller_identity.current.account_id
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild" {
@@ -171,9 +157,5 @@ resource "aws_codebuild_project" "this" {
     type      = "CODECOMMIT"
     location  = local.repo_url
     buildspec = var.buildspec
-  }
-
-  lifecycle {
-    ignore_changes = [project_visibility]
   }
 }
