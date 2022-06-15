@@ -49,12 +49,7 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 }
 
 data "aws_iam_policy_document" "codebuild" {
-  override_json = templatefile(var.policy_override, {
-    repo_name  = var.repo_name
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
-  })
+  override_json = var.policy_override
 
   statement {
     actions = [
@@ -90,12 +85,7 @@ resource "aws_iam_role_policy" "codebuild" {
 data "aws_iam_policy" "codebuild" {
   count = length(var.policy_arns)
 
-  arn = templatefile(var.policy_arns[count.index], {
-    repo_name  = var.repo_name
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
-  })
+  arn = var.policy_arns[count.index]
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild" {
