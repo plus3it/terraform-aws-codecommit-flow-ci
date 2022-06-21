@@ -9,7 +9,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  stage             = "branch-${var.branch}"
+  stage             = "branch-${replace(var.branch, "/", "")}"
   stage_description = "Execute a job/buildspec when the ${var.branch} branch is updated in ${var.repo_name}"
   repo_arn          = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
 
