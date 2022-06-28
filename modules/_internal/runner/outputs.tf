@@ -1,6 +1,6 @@
 output "codebuild_project_arn" {
   description = "ARN of the CodeBuild Project"
-  value       = aws_codebuild_project.this.id
+  value       = aws_codebuild_project.this.arn
 }
 
 output "codebuild_project_name" {
