@@ -82,6 +82,12 @@ variable "policy_override" {
   default     = ""
 }
 
+variable "python_runtime" {
+  type        = string
+  description = "Python runtime for the handler Lambda function"
+  default     = null
+}
+
 variable "queued_timeout" {
   type        = number
   description = "How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out"

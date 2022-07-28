@@ -14,6 +14,7 @@ module "branch" {
   environment_variables = var.environment_variables
   policy_arns           = var.policy_arns
   policy_override       = var.policy_override
+  python_runtime        = var.python_runtime
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
@@ -34,6 +35,7 @@ module "review" {
   environment_variables = var.environment_variables
   policy_arns           = var.policy_arns
   policy_override       = var.policy_override
+  python_runtime        = var.python_runtime
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
@@ -55,6 +57,7 @@ module "schedule" {
   environment_variables = var.environment_variables
   policy_arns           = var.policy_arns
   policy_override       = var.policy_override
+  python_runtime        = var.python_runtime
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
@@ -75,6 +78,7 @@ module "tag" {
   environment_variables = var.environment_variables
   policy_arns           = var.policy_arns
   policy_override       = var.policy_override
+  python_runtime        = var.python_runtime
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags

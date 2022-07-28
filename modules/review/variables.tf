@@ -72,3 +72,9 @@ variable "policy_override" {
   description = "IAM policy document in JSON that extends the basic inline CodeBuild service role"
   default     = ""
 }
+
+variable "python_runtime" {
+  type        = string
+  description = "Python runtime for the handler Lambda function"
+  default     = null
+}

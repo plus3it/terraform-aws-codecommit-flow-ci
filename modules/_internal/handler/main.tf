@@ -22,7 +22,7 @@ module "handler" {
   function_name = local.name_slug
   description   = var.stage_description
   handler       = "lambda.${var.handler}"
-  runtime       = "python3.6"
+  runtime       = var.python_runtime
   timeout       = 300
 
   // Specify a file or directory for the source code.

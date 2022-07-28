@@ -54,6 +54,7 @@ module "handler" {
   stage_description      = local.stage_description
   repo_name              = var.repo_name
   project_arn            = module.runner.codebuild_project_arn
+  python_runtime         = var.python_runtime
   lambda_policy_override = data.aws_iam_policy_document.handler.json
 }
 
