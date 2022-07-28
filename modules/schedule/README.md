@@ -35,6 +35,7 @@ Trigger a build on a schedule.
 | <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | List of environment variable map objects for the CodeBuild job | `list(map(string))` | `[]` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | List of IAM policy ARNs to attach to the CodeBuild service role | `list(string)` | `[]` | no |
 | <a name="input_policy_override"></a> [policy\_override](#input\_policy\_override) | IAM policy document in JSON that extends the basic inline CodeBuild service role | `string` | `""` | no |
+| <a name="input_python_runtime"></a> [python\_runtime](#input\_python\_runtime) | Python runtime for the handler Lambda function | `string` | `null` | no |
 | <a name="input_queued_timeout"></a> [queued\_timeout](#input\_queued\_timeout) | How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out | `number` | `null` | no |
 | <a name="input_source_version"></a> [source\_version](#input\_source\_version) | A version of the build input to be built for this project. If not specified, the latest version is used | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the resource | `map(string)` | `{}` | no |

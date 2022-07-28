@@ -36,6 +36,7 @@ module "handler" {
   stage_description = local.stage_description
   repo_name         = var.repo_name
   project_arn       = module.runner.codebuild_project_arn
+  python_runtime    = var.python_runtime
 }
 
 module "runner" {

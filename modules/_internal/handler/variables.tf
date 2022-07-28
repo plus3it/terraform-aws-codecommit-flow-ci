@@ -28,3 +28,10 @@ variable "lambda_policy_override" {
   description = "IAM policy document in JSON that extends the Lambda service role"
   default     = ""
 }
+
+variable "python_runtime" {
+  type        = string
+  description = "Python runtime for the Lambda function"
+  default     = "python3.9"
+  nullable    = false
+}
