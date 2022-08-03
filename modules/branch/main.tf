@@ -13,19 +13,19 @@ locals {
   stage_description = "Execute a job/buildspec when the ${var.branch} branch is updated in ${var.repo_name}"
   repo_arn          = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
 
-  event_pattern = <<-PATTERN
+  event_pattern = jsonencode(
     {
-      "detail-type": ["CodeCommit Repository State Change"],
-      "source": ["aws.codecommit"],
-      "resources": ["${local.repo_arn}"],
-      "detail": {
-        "event": ["referenceUpdated"],
-        "repositoryName": ["${var.repo_name}"],
-        "referenceType": ["branch"],
-        "referenceName": ["${var.branch}"]
+      "detail-type" : ["CodeCommit Repository State Change"],
+      "source" : ["aws.codecommit"],
+      "resources" : [local.repo_arn],
+      "detail" : {
+        "event" : ["referenceUpdated"],
+        "repositoryName" : [var.repo_name],
+        "referenceType" : ["branch"],
+        "referenceName" : [var.branch]
       }
     }
-    PATTERN
+  )
 }
 
 module "handler" {

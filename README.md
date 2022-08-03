@@ -403,7 +403,7 @@ No resources.
 | <a name="input_repo_name"></a> [repo\_name](#input\_repo\_name) | Name of the CodeCommit repository | `string` | n/a | yes |
 | <a name="input_artifacts"></a> [artifacts](#input\_artifacts) | Map defining an artifacts object for the CodeBuild job | `map(string)` | `{}` | no |
 | <a name="input_badge_enabled"></a> [badge\_enabled](#input\_badge\_enabled) | Generates a publicly-accessible URL for the projects build badge | `bool` | `null` | no |
-| <a name="input_branch"></a> [branch](#input\_branch) | Name of the branch where updates will trigger a build. Used only when `event` is "branch" | `string` | `"master"` | no |
+| <a name="input_branch"></a> [branch](#input\_branch) | Name of the branch where updates will trigger a build. Used only when `event` is "branch" | `string` | `null` | no |
 | <a name="input_build_timeout"></a> [build\_timeout](#input\_build\_timeout) | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed | `number` | `null` | no |
 | <a name="input_buildspec"></a> [buildspec](#input\_buildspec) | Buildspec used when the specified branch is updated | `string` | `""` | no |
 | <a name="input_encryption_key"></a> [encryption\_key](#input\_encryption\_key) | The AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts | `string` | `null` | no |

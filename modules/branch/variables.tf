@@ -2,6 +2,7 @@ variable "branch" {
   type        = string
   description = "Name of the branch where updates will trigger a build"
   default     = "master"
+  nullable    = false
 }
 
 variable "repo_name" {
