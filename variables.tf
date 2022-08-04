@@ -37,7 +37,7 @@ variable "badge_enabled" {
 variable "branch" {
   type        = string
   description = "Name of the branch where updates will trigger a build. Used only when `event` is \"branch\""
-  default     = "master"
+  default     = null
 }
 
 variable "build_timeout" {
