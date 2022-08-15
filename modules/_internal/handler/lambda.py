@@ -40,11 +40,6 @@ cloudwatchlogs = boto3.client("logs")
 PROJECT_NAME = os.environ["PROJECT_NAME"]
 
 
-def dump_json(data, indent=2, **opts):
-    """Dump JSON output with custom, localized defaults."""
-    return json.dumps(data, indent=indent, **opts)
-
-
 def start_build(params):
     """Start a CodeBuild job."""
     log.info("Sending request to StartBuild...")
@@ -89,6 +84,11 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
     ]
 
     if pull_request_id and source_commit and destination_commit:
+        logs = additional_information.get("logs", {})
+        log_group = logs.get("group-name")
+        log_stream = logs.get("stream-name")
+        log_deep_link = logs.get("deep-link")
+
         build_arn = event_details["build-id"]
         build_id = build_arn.split("/")[-1]
         build_uuid = build_id.split(":")[-1]
@@ -96,11 +96,12 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
         repo_name = source_url.split("/")[-1]
         project_name = event_details["project-name"]
         build_status = event_details["build-status"]
+        console_host = urllib.parse.urlparse(log_deep_link).hostname
         region = event["region"]
         request_token = build_arn + build_status
         safe_build_id = urllib.parse.quote(build_id, safe="~@#$&()*!+=:;,.?/'")
         job_url = (
-            f"https://{region}.console.aws.amazon.com/codebuild/home?"
+            f"https://{region}.{console_host}/codebuild/home?"
             f"region={region}#/builds/{safe_build_id}/view/new"
         )
 
@@ -136,10 +137,6 @@ def handle_codebuild_review_event(event):  # pylint: disable=too-many-locals
         )
 
         # Add build logs to the comment for failed builds
-        logs = additional_information.get("logs", {})
-        log_group = logs.get("group-name")
-        log_stream = logs.get("stream-name")
-
         if (
             build_status not in ["IN_PROGRESS", "SUCCEEDED", "STOPPED"]
             and log_group
@@ -323,7 +320,7 @@ def schedule_cloudwatch_event(event):
 def review_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "review" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if review_codebuild_event(event):
             log.info("Handling valid CodeBuild review event...")
@@ -341,7 +338,7 @@ def review_handler(event, context):  # pylint: disable=unused-argument
 def branch_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "branch" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if branch_repository_event(event):
             log.info("Handling valid CodeCommit branch event...")
@@ -356,7 +353,7 @@ def branch_handler(event, context):  # pylint: disable=unused-argument
 def tag_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "tag" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if tag_repository_event(event):
             log.info("Handling valid CodeCommit tag event...")
@@ -371,7 +368,7 @@ def tag_handler(event, context):  # pylint: disable=unused-argument
 def schedule_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "schedule" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if schedule_cloudwatch_event(event):
             log.info("Handling valid CloudWatch schedule event...")
