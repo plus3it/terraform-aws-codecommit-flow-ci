@@ -40,11 +40,6 @@ cloudwatchlogs = boto3.client("logs")
 PROJECT_NAME = os.environ["PROJECT_NAME"]
 
 
-def dump_json(data, indent=2, **opts):
-    """Dump JSON output with custom, localized defaults."""
-    return json.dumps(data, indent=indent, **opts)
-
-
 def start_build(params):
     """Start a CodeBuild job."""
     log.info("Sending request to StartBuild...")
@@ -325,7 +320,7 @@ def schedule_cloudwatch_event(event):
 def review_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "review" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if review_codebuild_event(event):
             log.info("Handling valid CodeBuild review event...")
@@ -343,7 +338,7 @@ def review_handler(event, context):  # pylint: disable=unused-argument
 def branch_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "branch" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if branch_repository_event(event):
             log.info("Handling valid CodeCommit branch event...")
@@ -358,7 +353,7 @@ def branch_handler(event, context):  # pylint: disable=unused-argument
 def tag_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "tag" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if tag_repository_event(event):
             log.info("Handling valid CodeCommit tag event...")
@@ -373,7 +368,7 @@ def tag_handler(event, context):  # pylint: disable=unused-argument
 def schedule_handler(event, context):  # pylint: disable=unused-argument
     """Entry point for the lambda "schedule" handler."""
     try:
-        log.info("Received event:\n%s", dump_json(event))
+        log.info("Received event:\n%s", json.dumps(event))
 
         if schedule_cloudwatch_event(event):
             log.info("Handling valid CloudWatch schedule event...")
