@@ -98,7 +98,7 @@ resource "aws_iam_role" "codebuild" {
   name_prefix         = "flow-ci-codebuild-service-role-"
   description         = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
   assume_role_policy  = data.aws_iam_policy_document.codebuild_assume_role.json
-  managed_policy_arns = var.policy_arns
+  managed_policy_arns = data.template_file.policy_arns[*].rendered
   inline_policy {
     name   = "${local.name_slug}-codebuild"
     policy = data.aws_iam_policy_document.codebuild.json
