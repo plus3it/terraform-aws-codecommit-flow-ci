@@ -70,7 +70,7 @@ variable "environment_variables" {
 
 variable "policy_arns" {
   type        = list(string)
-  description = "List of IAM policy ARNs to attach to the CodeBuild service role"
+  description = "List of IAM policy ARNs to attach to the CodeBuild service role or null to support ignoring externally attached policies"
   default     = []
 }
 
