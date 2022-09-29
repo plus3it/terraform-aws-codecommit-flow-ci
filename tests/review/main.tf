@@ -1,7 +1,15 @@
-module "test_review" {
-  source = "../..//modules/review"
+locals {
+  reviews = {
+    "test-review-flow-ci" = []
+  }
+}
 
-  repo_name = local.repo_name
+module "test_review" {
+  for_each = local.reviews
+  source   = "../..//modules/review"
+
+  repo_name   = each.key
+  policy_arns = each.value
 
   badge_enabled  = true
   build_timeout  = 20
@@ -16,6 +24,3 @@ module "test_review" {
   }
 }
 
-locals {
-  repo_name = "test-review-flow-ci"
-}

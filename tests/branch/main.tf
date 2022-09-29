@@ -30,11 +30,20 @@ module "test_branch" {
     OVERRIDE
 }
 
-module "test_branch2" {
-  source = "../..//modules/branch"
 
-  repo_name = local.repo_name
-  branch    = "test/dev"
+locals {
+  branches = {
+    "test/dev"  = []
+    "test/dev2" = null
+  }
+}
+module "test_branch2" {
+  for_each = local.branches
+  source   = "../..//modules/branch"
+
+  repo_name   = local.repo_name
+  branch      = each.key
+  policy_arns = each.value
 
   environment = {
     compute_type = "BUILD_GENERAL1_LARGE"

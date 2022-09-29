@@ -1,9 +1,17 @@
+locals {
+  branches = {
+    "test-branch-flow-ci"  = []
+    "test2-branch-flow-ci" = null
+  }
+}
 module "test_branch" {
-  source = "../../"
+  for_each = local.branches
+  source   = "../../"
 
-  event     = "branch"
-  branch    = "master"
-  repo_name = local.branch_repo_name
+  event       = "branch"
+  branch      = "master"
+  repo_name   = each.key
+  policy_arns = each.value
 
   environment = {
     compute_type = "BUILD_GENERAL1_LARGE"
@@ -23,7 +31,7 @@ module "test_branch" {
                     }
                 },
                 "Effect": "Allow",
-                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.branch_repo_name}",
+                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${each.key}",
                 "Sid": ""
             }
         ]
@@ -31,12 +39,19 @@ module "test_branch" {
     OVERRIDE
 }
 
+locals {
+  reviews = {
+    "test-review-flow-ci"  = []
+    "test2-review-flow-ci" = null
+  }
+}
 module "test_review" {
-  source = "../../"
+  for_each = local.reviews
+  source   = "../../"
 
-  event     = "review"
-  repo_name = local.review_repo_name
-
+  event          = "review"
+  repo_name      = each.key
+  policy_arns    = each.value
   badge_enabled  = true
   build_timeout  = 20
   queued_timeout = 60
@@ -49,11 +64,19 @@ module "test_review" {
   }
 }
 
+locals {
+  schedules = {
+    "schedule_repo_name"  = []
+    "schedule2_repo_name" = null
+  }
+}
 module "test_schedule" {
-  source = "../../"
+  for_each = local.schedules
+  source   = "../../"
 
-  event     = "schedule"
-  repo_name = local.schedule_repo_name
+  event       = "schedule"
+  repo_name   = each.key
+  policy_arns = each.value
 
   schedule_expression = "cron(0 11 ? * MON-FRI *)"
 
@@ -62,22 +85,23 @@ module "test_schedule" {
   }
 }
 
+locals {
+  tags = {
+    "test-tag-flow-ci"  = []
+    "test2-tag-flow-ci" = null
+  }
+}
 module "test_tag" {
-  source = "../../"
+  for_each = local.tags
+  source   = "../../"
 
-  event     = "tag"
-  repo_name = local.tag_repo_name
+  event       = "tag"
+  repo_name   = each.key
+  policy_arns = each.value
 
   environment = {
     compute_type = "BUILD_GENERAL1_LARGE"
   }
-}
-
-locals {
-  branch_repo_name   = "test-branch-flow-ci"
-  review_repo_name   = "test-review-flow-ci"
-  schedule_repo_name = "test-schedule-flow-ci"
-  tag_repo_name      = "test-tag-flow-ci"
 }
 
 data "aws_partition" "current" {}
