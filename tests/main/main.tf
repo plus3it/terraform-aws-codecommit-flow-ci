@@ -1,7 +1,19 @@
 locals {
+  branch_repo_name = "test-branch-flow-ci"
+
   branches = {
-    "test-branch-flow-ci"  = []
-    "test2-branch-flow-ci" = null
+    master_branch = {
+      branch      = "master"
+      policy_arns = []
+    }
+    test_empty_list = {
+      branch      = "test/empty"
+      policy_arns = []
+    }
+    test_null = {
+      branch      = "test/null"
+      policy_arns = null
+    }
   }
 }
 module "test_branch" {
@@ -9,9 +21,9 @@ module "test_branch" {
   source   = "../../"
 
   event       = "branch"
-  branch      = "master"
-  repo_name   = each.key
-  policy_arns = each.value
+  branch      = each.value.branch
+  repo_name   = local.branch_repo_name
+  policy_arns = each.value.policy_arns
 
   environment = {
     compute_type = "BUILD_GENERAL1_LARGE"
@@ -31,7 +43,7 @@ module "test_branch" {
                     }
                 },
                 "Effect": "Allow",
-                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${each.key}",
+                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.branch_repo_name}",
                 "Sid": ""
             }
         ]
@@ -41,8 +53,14 @@ module "test_branch" {
 
 locals {
   reviews = {
-    "test-review-flow-ci"  = []
-    "test2-review-flow-ci" = null
+    review1 = {
+      repo_name   = "test-review1-flow-ci"
+      policy_arns = []
+    }
+    review2 = {
+      repo_name   = "test-review2-flow-ci"
+      policy_arns = null
+    }
   }
 }
 module "test_review" {
@@ -50,8 +68,8 @@ module "test_review" {
   source   = "../../"
 
   event          = "review"
-  repo_name      = each.key
-  policy_arns    = each.value
+  repo_name      = each.value.repo_name
+  policy_arns    = each.value.policy_arns
   badge_enabled  = true
   build_timeout  = 20
   queued_timeout = 60
@@ -66,8 +84,14 @@ module "test_review" {
 
 locals {
   schedules = {
-    "schedule_repo_name"  = []
-    "schedule2_repo_name" = null
+    schedule1 = {
+      repo_name   = "test-schedule1-flow-ci"
+      policy_arns = []
+    }
+    schedule2 = {
+      repo_name   = "test-schedule2-flow-ci"
+      policy_arns = null
+    }
   }
 }
 module "test_schedule" {
@@ -75,8 +99,8 @@ module "test_schedule" {
   source   = "../../"
 
   event       = "schedule"
-  repo_name   = each.key
-  policy_arns = each.value
+  repo_name   = each.value.repo_name
+  policy_arns = each.value.policy_arns
 
   schedule_expression = "cron(0 11 ? * MON-FRI *)"
 
@@ -87,8 +111,14 @@ module "test_schedule" {
 
 locals {
   tags = {
-    "test-tag-flow-ci"  = []
-    "test2-tag-flow-ci" = null
+    tag1 = {
+      repo_name   = "test-tag1-flow-ci"
+      policy_arns = []
+    }
+    tag2 = {
+      repo_name   = "test-tag2-flow-ci"
+      policy_arns = null
+    }
   }
 }
 module "test_tag" {
@@ -96,8 +126,8 @@ module "test_tag" {
   source   = "../../"
 
   event       = "tag"
-  repo_name   = each.key
-  policy_arns = each.value
+  repo_name   = each.value.repo_name
+  policy_arns = each.value.policy_arns
 
   environment = {
     compute_type = "BUILD_GENERAL1_LARGE"
