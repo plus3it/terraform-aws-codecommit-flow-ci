@@ -49,7 +49,7 @@ data "template_file" "codebuild_policy_override" {
 }
 
 data "template_file" "policy_arns" {
-  count = length(var.policy_arns)
+  count = var.policy_arns != null ? length(var.policy_arns) : 0
 
   template = var.policy_arns[count.index]
 
@@ -95,32 +95,17 @@ data "aws_iam_policy_document" "codebuild" {
 }
 
 resource "aws_iam_role" "codebuild" {
-  name_prefix        = "flow-ci-codebuild-service-role-"
-  description        = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
-  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
-}
-
-resource "aws_iam_role_policy" "codebuild" {
-  name   = "${local.name_slug}-codebuild"
-  role   = aws_iam_role.codebuild.id
-  policy = data.aws_iam_policy_document.codebuild.json
-}
-
-data "aws_iam_policy" "codebuild" {
-  count = length(var.policy_arns)
-
-  arn = data.template_file.policy_arns[count.index].rendered
-}
-
-resource "aws_iam_role_policy_attachment" "codebuild" {
-  count = length(var.policy_arns)
-
-  role       = aws_iam_role.codebuild.id
-  policy_arn = element(data.aws_iam_policy.codebuild.*.arn, count.index)
+  name_prefix         = "flow-ci-codebuild-service-role-"
+  description         = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
+  assume_role_policy  = data.aws_iam_policy_document.codebuild_assume_role.json
+  managed_policy_arns = var.policy_arns != null ? data.template_file.policy_arns[*].rendered : null
+  inline_policy {
+    name   = "${local.name_slug}-codebuild"
+    policy = data.aws_iam_policy_document.codebuild.json
+  }
 }
 
 # CodeBuild Resources
-
 resource "aws_codebuild_project" "this" {
   name         = local.name_slug
   description  = var.stage_description

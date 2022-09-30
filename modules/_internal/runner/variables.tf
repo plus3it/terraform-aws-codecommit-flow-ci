@@ -72,7 +72,7 @@ variable "environment_variables" {
 
 variable "policy_arns" {
   type        = list(string)
-  description = "List of IAM policiy ARNs to attach to the CodeBuild service role"
+  description = "List of IAM policy ARNs to attach to the CodeBuild service role"
 }
 
 variable "policy_override" {

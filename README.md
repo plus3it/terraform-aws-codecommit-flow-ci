@@ -8,10 +8,10 @@ This project aims to help implement CI/CD git workflows for CodeCommit
 repositories. Fundamentally, we want to be able to trigger the CI system
 (CodeBuild) when certain events occur in the CodeCommit reopository:
 
-*   Pull request opened or source commit modified
-*   Branch HEAD modified
-*   Tag created or updated
-*   Scheduled build (e.g. "cron")
+* Pull request opened or source commit modified
+* Branch HEAD modified
+* Tag created or updated
+* Scheduled build (e.g. "cron")
 
 All of the building blocks are there, pull requests, CloudWatch Events, etc,
 but understanding the event structures and linking the events to the CI system
@@ -28,16 +28,16 @@ course for each CodeBuild project you can specify a different buildspec.
 The top-level module is a wrapper around each of the "event" modules. There is
 also a public module for each of the events mentioned above:
 
-*   [branch](modules/branch)
-*   [review](modules/review) -- i.e. the pull request event
-*   [tag](modules/tag)
-*   [schedule](modules/schedule)
+* [branch](modules/branch)
+* [review](modules/review) -- i.e. the pull request event
+* [tag](modules/tag)
+* [schedule](modules/schedule)
 
 In general, each module sets up the following resources:
 
-*   CloudWatch Events
-*   Lambda
-*   CodeBuild
+* CloudWatch Events
+* Lambda
+* CodeBuild
 
 When a matching event occurs in the repository, CloudWatch Events triggers the
 Lambda function. The Lambda function extracts information from the event, most
@@ -53,10 +53,10 @@ get updates on whether the CI passed/failed right within the pull request.
 
 In this example, we setup the CI to execute automatically on four events:
 
-*   A pull request is opened or updated (`review` module)
-*   The `master` branch is updated (`branch` module)
-*   A tag is created or updated (`tag` module)
-*   A weekday schedule (`schedule` module)
+* A pull request is opened or updated (`review` module)
+* The `master` branch is updated (`branch` module)
+* A tag is created or updated (`tag` module)
+* A weekday schedule (`schedule` module)
 
 We have separate buildspecs for each event-type, and we keep those buildspecs
 together in the repository, in the `buildspecs` directory.
@@ -77,12 +77,12 @@ When the tag is created, the `tag` CI then executes the job as defined by
 `buildspecs/tag.yaml` to handle the release. Examples of things a buildspec
 might do in this case:
 
-*   Publish a package to a repository (PyPI, RubyGems, npm, etc)
-*   Generate and push artifacts to S3
-*   Initiate a CodePipeline
-*   Launch/update a CloudFormation stack
-*   Run terraform plan/apply
-*   Etc, etc, whatever constitutes your "release"...
+* Publish a package to a repository (PyPI, RubyGems, npm, etc)
+* Generate and push artifacts to S3
+* Initiate a CodePipeline
+* Launch/update a CloudFormation stack
+* Run terraform plan/apply
+* Etc, etc, whatever constitutes your "release"...
 
 ```hcl
 module "review" {
@@ -230,13 +230,18 @@ thorough description of the options for the environment variable map object.
 ### `policy_arns` variable object
 
 The `policy_arns` variable is a list of IAM policy ARNs to attach to the
-CodeBuild service role. Example:
+CodeBuild service role, or null to support ignoring externally attached policies
+Example:
 
 ```hcl
 policy_arns = [
   "arn:<partition>:iam::<account>:policy/foo",
   "arn:<partition>:iam::<account>:policy/bar"
 ]
+```
+
+```hcl
+policy_arns = null
 ```
 
 ### `policy_override` variable object
@@ -277,18 +282,18 @@ into the corresponding CodeBuild job, using information from the event that
 invoked the function. These variables are available in the job environment, and
 so you may reference them from your buildspecs.
 
-*   `review`
-    *   `FLOW_PULL_REQUEST_ID`: ID of the pull request that triggered the event
-    *   `FLOW_PULL_REQUEST_SRC_COMMIT`: SHA of the source commit in the pull
+* `review`
+  * `FLOW_PULL_REQUEST_ID`: ID of the pull request that triggered the event
+  * `FLOW_PULL_REQUEST_SRC_COMMIT`: SHA of the source commit in the pull
         request
-    *   `FLOW_PULL_REQUEST_DST_COMMIT`: SHA of the destination commit (the
+  * `FLOW_PULL_REQUEST_DST_COMMIT`: SHA of the destination commit (the
         target branch) in the pull request
-*   `branch`
-    *   `FLOW_BRANCH`: Name of the branch that triggered the event
-*   `tag`
-    *   `FLOW_TAG`: Name of the tag that triggered the event
-*   `schedule`
-    *   `FLOW_SCHEDULE`: Time associated with the scheduled event
+* `branch`
+  * `FLOW_BRANCH`: Name of the branch that triggered the event
+* `tag`
+  * `FLOW_TAG`: Name of the tag that triggered the event
+* `schedule`
+  * `FLOW_SCHEDULE`: Time associated with the scheduled event
 
 ## Builtin CodeBuild service role
 
@@ -367,7 +372,7 @@ At the moment, testing is manual:
 
 ```
 # Replace "xxx" with an actual AWS profile, then execute the integration tests.
-export AWS_PROFILE=xxx 
+export AWS_PROFILE=xxx
 make terraform/pytest PYTEST_ARGS="-v --nomock"
 ```
 
