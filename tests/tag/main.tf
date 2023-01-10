@@ -23,4 +23,3 @@ module "test_tag" {
     compute_type = "BUILD_GENERAL1_LARGE"
   }
 }
-

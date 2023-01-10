@@ -22,6 +22,13 @@ variable "repo_name" {
   description = "Name of the CodeCommit repository"
 }
 
+variable "name_prefix" {
+  type        = string
+  description = "Prefix to attach to repo name"
+  default     = ""
+  nullable    = false
+}
+
 variable "artifacts" {
   type        = map(string)
   description = "Map defining an artifacts object for the CodeBuild job"

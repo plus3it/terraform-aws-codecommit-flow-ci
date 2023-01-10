@@ -3,7 +3,7 @@ terraform {
 }
 
 locals {
-  name_slug    = "${var.repo_name}-${var.stage}-flow-ci"
+  name_slug    = "${var.name_prefix}${var.repo_name}-${var.stage}-flow-ci"
   project_name = element(split("/", element(split(":", var.project_arn), 5)), 1)
 }
 
