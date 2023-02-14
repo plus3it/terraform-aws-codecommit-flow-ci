@@ -16,10 +16,12 @@ locals {
     }
   }
 }
-module "test_branch" {
+
+module "test_main" {
   for_each = local.branches
   source   = "../../"
 
+  name_prefix = "tardigrade-"
   event       = "branch"
   branch      = each.value.branch
   repo_name   = local.branch_repo_name
@@ -67,6 +69,7 @@ module "test_review" {
   for_each = local.reviews
   source   = "../../"
 
+  name_prefix    = "tardigrade-"
   event          = "review"
   repo_name      = each.value.repo_name
   policy_arns    = each.value.policy_arns
@@ -94,10 +97,12 @@ locals {
     }
   }
 }
+
 module "test_schedule" {
   for_each = local.schedules
   source   = "../../"
 
+  name_prefix = "tardigrade-"
   event       = "schedule"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
@@ -121,10 +126,12 @@ locals {
     }
   }
 }
+
 module "test_tag" {
   for_each = local.tags
   source   = "../../"
 
+  name_prefix = "tardigrade-"
   event       = "tag"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns

@@ -14,8 +14,9 @@ locals {
 
 module "test_tag" {
   for_each = local.tags
-  source   = "../..//modules/tag"
+  source   = "../../modules/tag"
 
+  name_prefix = "tardigrade-"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
 

@@ -13,8 +13,9 @@ locals {
 
 module "test_schedule" {
   for_each = local.schedules
-  source   = "../..//modules/schedule"
+  source   = "../../modules/schedule"
 
+  name_prefix = "tardigrade-"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
 

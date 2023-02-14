@@ -16,10 +16,12 @@ locals {
     }
   }
 }
+
 module "test_branch" {
   for_each = local.branches
-  source   = "../..//modules/branch"
+  source   = "../../modules/branch"
 
+  name_prefix = "tardigrade-"
   repo_name   = local.repo_name
   branch      = each.value.branch
   policy_arns = each.value.policy_arns
