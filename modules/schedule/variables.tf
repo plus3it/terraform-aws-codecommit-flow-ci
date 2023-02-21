@@ -3,6 +3,13 @@ variable "repo_name" {
   description = "Name of the CodeCommit repository"
 }
 
+variable "name_prefix" {
+  type        = string
+  description = "Prefix to attach to repo name"
+  default     = ""
+  nullable    = false
+}
+
 variable "schedule_expression" {
   type        = string
   description = "CloudWatch Event schedule that triggers the CodeBuild job"

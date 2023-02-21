@@ -2,8 +2,8 @@ module "branch" {
   source = "./modules/branch"
   count  = var.event == "branch" ? 1 : 0
 
-  branch    = var.branch
-  repo_name = var.repo_name
+  branch = var.branch
+  name   = "${var.name_prefix}${var.repo_name}"
 
   artifacts             = var.artifacts
   buildspec             = var.buildspec
@@ -24,7 +24,7 @@ module "review" {
   source = "./modules/review"
   count  = var.event == "review" ? 1 : 0
 
-  repo_name = var.repo_name
+  name = "${var.name_prefix}${var.repo_name}"
 
   artifacts             = var.artifacts
   buildspec             = var.buildspec
@@ -45,7 +45,7 @@ module "schedule" {
   source = "./modules/schedule"
   count  = var.event == "schedule" ? 1 : 0
 
-  repo_name           = var.repo_name
+  name                = "${var.name_prefix}${var.repo_name}"
   schedule_expression = var.schedule_expression
 
   artifacts             = var.artifacts
@@ -67,7 +67,7 @@ module "tag" {
   source = "./modules/tag"
   count  = var.event == "tag" ? 1 : 0
 
-  repo_name = var.repo_name
+  name = "${var.name_prefix}${var.repo_name}"
 
   artifacts             = var.artifacts
   buildspec             = var.buildspec

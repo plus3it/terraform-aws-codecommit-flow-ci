@@ -9,7 +9,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  name_slug     = "${var.repo_name}-${var.stage}-flow-ci"
+  name_slug     = "${var.name_prefix}${var.repo_name}-${var.stage}-flow-ci"
   log_group_arn = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${local.name_slug}"
   repo_arn      = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
   repo_url      = "https://git-codecommit.${data.aws_region.current.name}.amazonaws.com/v1/repos/${var.repo_name}"
@@ -41,7 +41,7 @@ data "template_file" "codebuild_policy_override" {
   template = var.policy_override
 
   vars = {
-    repo_name  = var.repo_name
+    name       = "${var.name_prefix}${var.repo_name}"
     partition  = data.aws_partition.current.partition
     region     = data.aws_region.current.name
     account_id = data.aws_caller_identity.current.account_id
@@ -54,7 +54,7 @@ data "template_file" "policy_arns" {
   template = var.policy_arns[count.index]
 
   vars = {
-    repo_name  = var.repo_name
+    name       = "${var.name_prefix}${var.repo_name}"
     partition  = data.aws_partition.current.partition
     region     = data.aws_region.current.name
     account_id = data.aws_caller_identity.current.account_id

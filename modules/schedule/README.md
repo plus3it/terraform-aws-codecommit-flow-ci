@@ -33,6 +33,7 @@ Trigger a build on a schedule.
 | <a name="input_encryption_key"></a> [encryption\_key](#input\_encryption\_key) | The AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts | `string` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Map describing the environment object for the CodeBuild job | `map(string)` | `{}` | no |
 | <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | List of environment variable map objects for the CodeBuild job | `list(map(string))` | `[]` | no |
+| <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Prefix to attach to repo name | `string` | `""` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | List of IAM policy ARNs to attach to the CodeBuild service role or null to support ignoring externally attached policies | `list(string)` | `[]` | no |
 | <a name="input_policy_override"></a> [policy\_override](#input\_policy\_override) | IAM policy document in JSON that extends the basic inline CodeBuild service role | `string` | `""` | no |
 | <a name="input_python_runtime"></a> [python\_runtime](#input\_python\_runtime) | Python runtime for the handler Lambda function | `string` | `null` | no |

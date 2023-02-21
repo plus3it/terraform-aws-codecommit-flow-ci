@@ -52,7 +52,7 @@ module "handler" {
   handler                = "review_handler"
   stage                  = local.stage
   stage_description      = local.stage_description
-  repo_name              = var.repo_name
+  name                   = "${var.name_prefix}${var.repo_name}"
   project_arn            = module.runner.codebuild_project_arn
   python_runtime         = var.python_runtime
   lambda_policy_override = data.aws_iam_policy_document.handler.json
@@ -63,7 +63,7 @@ module "runner" {
 
   stage                 = local.stage
   stage_description     = local.stage_description
-  repo_name             = var.repo_name
+  name                  = "${var.name_prefix}${var.repo_name}"
   buildspec             = var.buildspec
   artifacts             = var.artifacts
   environment           = var.environment
@@ -85,7 +85,7 @@ module "trigger_pull_request" {
   stage             = "${local.stage}-pull-request"
   stage_description = local.stage_description
   target_arn        = module.handler.function_arn
-  repo_name         = var.repo_name
+  name              = "${var.name_prefix}${var.repo_name}"
   event_pattern     = local.event_pattern_pull_request
 }
 
@@ -95,7 +95,7 @@ module "trigger_codebuild" {
   stage             = "${local.stage}-codebuild"
   stage_description = local.stage_description
   target_arn        = module.handler.function_arn
-  repo_name         = var.repo_name
+  name              = "${var.name_prefix}${var.repo_name}"
   event_pattern     = local.event_pattern_codebuild
 }
 

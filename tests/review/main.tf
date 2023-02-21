@@ -13,8 +13,9 @@ locals {
 
 module "test_review" {
   for_each = local.reviews
-  source   = "../..//modules/review"
+  source   = "../../modules/review"
 
+  name_prefix = "tardigrade-"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
 
@@ -30,4 +31,3 @@ module "test_review" {
     compute_type = "BUILD_GENERAL1_LARGE"
   }
 }
-
