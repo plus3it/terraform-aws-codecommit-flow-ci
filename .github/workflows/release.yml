@@ -14,7 +14,7 @@ on:
 
 jobs:
   release:
-    uses: plus3it/actions-workflows/.github/workflows/release.yml@86222127307c7f827e141bbc35cf0efb0e611648
+    uses: plus3it/actions-workflows/.github/workflows/release.yml@93a9326e07945e5441d0fadef735563290edd729
     with:
       mockstacktest-enable: false
     secrets:
