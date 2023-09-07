@@ -11,9 +11,10 @@ module "handler" {
   source = "../_internal/handler"
 
   handler           = "schedule_handler"
+  name_prefix       = var.name_prefix
+  repo_name         = var.repo_name
   stage             = local.stage
   stage_description = local.stage_description
-  name              = "${var.name_prefix}${var.repo_name}"
   project_arn       = module.runner.codebuild_project_arn
   python_runtime    = var.python_runtime
 }
@@ -21,9 +22,10 @@ module "handler" {
 module "runner" {
   source = "../_internal/runner"
 
+  name_prefix           = var.name_prefix
+  repo_name             = var.repo_name
   stage                 = local.stage
   stage_description     = local.stage_description
-  name                  = "${var.name_prefix}${var.repo_name}"
   buildspec             = var.buildspec
   artifacts             = var.artifacts
   environment           = var.environment
@@ -42,10 +44,11 @@ module "runner" {
 module "trigger" {
   source = "../_internal/trigger"
 
+  name_prefix         = var.name_prefix
+  repo_name           = var.repo_name
   stage               = local.stage
   stage_description   = local.stage_description
   target_arn          = module.handler.function_arn
-  name                = "${var.name_prefix}${var.repo_name}"
   schedule_expression = var.schedule_expression
 }
 

@@ -17,7 +17,7 @@ locals {
   }
 }
 
-module "test_main" {
+module "test_branch" {
   for_each = local.branches
   source   = "../../"
 

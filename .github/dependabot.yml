@@ -1,17 +1,17 @@
 version: 2
 updates:
-# Maintain dependencies for GitHub Actions
-- package-ecosystem: github-actions
-  directory: /
-  schedule:
-    interval: weekly
-- package-ecosystem: docker
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: terraform
-  directory: "/modules/_internal/handler"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: terraform
+    directory: "/modules/_internal/handler"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
