@@ -41,10 +41,12 @@ data "template_file" "codebuild_policy_override" {
   template = var.policy_override
 
   vars = {
-    name       = "${var.name_prefix}${var.repo_name}"
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
+    name        = "${var.name_prefix}${var.repo_name}"
+    name_prefix = var.name_prefix
+    partition   = data.aws_partition.current.partition
+    region      = data.aws_region.current.name
+    repo_name   = var.repo_name
+    account_id  = data.aws_caller_identity.current.account_id
   }
 }
 
@@ -54,10 +56,12 @@ data "template_file" "policy_arns" {
   template = var.policy_arns[count.index]
 
   vars = {
-    name       = "${var.name_prefix}${var.repo_name}"
-    partition  = data.aws_partition.current.partition
-    region     = data.aws_region.current.name
-    account_id = data.aws_caller_identity.current.account_id
+    name        = "${var.name_prefix}${var.repo_name}"
+    name_prefix = var.name_prefix
+    partition   = data.aws_partition.current.partition
+    region      = data.aws_region.current.name
+    repo_name   = var.repo_name
+    account_id  = data.aws_caller_identity.current.account_id
   }
 }
 
