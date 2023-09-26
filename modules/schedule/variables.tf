@@ -38,11 +38,13 @@ variable "queued_timeout" {
   description = "How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out"
   default     = null
 }
+
 variable "encryption_key" {
   type        = string
   description = "The AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts"
   default     = null
 }
+
 variable "source_version" {
   type        = string
   description = "A version of the build input to be built for this project. If not specified, the latest version is used"
@@ -71,6 +73,16 @@ variable "environment_variables" {
   type        = list(map(string))
   description = "List of environment variable map objects for the CodeBuild job"
   default     = []
+}
+
+variable "vpc_config" {
+  description = "Object of inputs for the VPC configuration of the CodeBuild job"
+  type = object({
+    security_group_ids = list(string)
+    subnets            = list(string)
+    vpc_id             = string
+  })
+  default = null
 }
 
 variable "policy_arns" {

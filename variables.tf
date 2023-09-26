@@ -77,6 +77,7 @@ variable "environment_variables" {
   default     = []
 }
 
+
 variable "policy_arns" {
   type        = list(string)
   description = "List of IAM policy ARNs to attach to the CodeBuild service role"
@@ -117,4 +118,14 @@ variable "tags" {
   type        = map(string)
   description = "A map of tags to assign to the resource"
   default     = {}
+}
+
+variable "vpc_config" {
+  description = "Object of inputs for the VPC configuration of the CodeBuild job"
+  type = object({
+    security_group_ids = list(string)
+    subnets            = list(string)
+    vpc_id             = string
+  })
+  default = null
 }

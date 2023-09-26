@@ -19,6 +19,7 @@ module "branch" {
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
+  vpc_config            = var.vpc_config
 }
 
 module "review" {
@@ -41,6 +42,7 @@ module "review" {
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
+  vpc_config            = var.vpc_config
 }
 
 module "schedule" {
@@ -64,6 +66,7 @@ module "schedule" {
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
+  vpc_config            = var.vpc_config
 }
 
 module "tag" {
@@ -86,4 +89,5 @@ module "tag" {
   queued_timeout        = var.queued_timeout
   source_version        = var.source_version
   tags                  = var.tags
+  vpc_config            = var.vpc_config
 }

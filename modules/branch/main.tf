@@ -53,6 +53,7 @@ module "runner" {
   environment_variables = var.environment_variables
   policy_override       = var.policy_override
   policy_arns           = var.policy_arns
+  vpc_config            = var.vpc_config
 
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
