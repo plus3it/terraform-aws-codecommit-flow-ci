@@ -422,6 +422,7 @@ No resources.
 | <a name="input_schedule_expression"></a> [schedule\_expression](#input\_schedule\_expression) | CloudWatch Event schedule that triggers the CodeBuild job. Required when `event` is "schedule" | `string` | `null` | no |
 | <a name="input_source_version"></a> [source\_version](#input\_source\_version) | A version of the build input to be built for this project. If not specified, the latest version is used | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the resource | `map(string)` | `{}` | no |
+| <a name="input_vpc_config"></a> [vpc\_config](#input\_vpc\_config) | Object of inputs for the VPC configuration of the CodeBuild job | <pre>object({<br>    security_group_ids = list(string)<br>    subnets            = list(string)<br>    vpc_id             = string<br>  })</pre> | `null` | no |
 
 ## Outputs
 
