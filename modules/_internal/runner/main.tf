@@ -156,6 +156,15 @@ resource "aws_codebuild_project" "this" {
     }
   }
 
+  dynamic "vpc_config" {
+    for_each = var.vpc_config != null ? [var.vpc_config] : []
+    content {
+      security_group_ids = vpc_config.value.security_group_ids
+      subnets            = vpc_config.value.subnets
+      vpc_id             = vpc_config.value.vpc_id
+    }
+  }
+
   source {
     type      = "CODECOMMIT"
     location  = local.repo_url
