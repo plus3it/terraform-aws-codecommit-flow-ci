@@ -96,6 +96,17 @@ data "aws_iam_policy_document" "codebuild" {
     actions   = ["codecommit:GitPull"]
     resources = [local.repo_arn]
   }
+
+  dynamic "statement" {
+    for_each = var.vpc_config != null ? [var.vpc_config] : []
+    content {
+      actions = [
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+      ]
+      resources = ["*"]
+    }
+  }
 }
 
 resource "aws_iam_role" "codebuild" {
