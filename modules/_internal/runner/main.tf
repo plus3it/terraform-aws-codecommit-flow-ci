@@ -43,6 +43,7 @@ data "template_file" "codebuild_policy_override" {
   vars = {
     name        = "${var.name_prefix}${var.repo_name}"
     name_prefix = var.name_prefix
+    name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
     region      = data.aws_region.current.name
     repo_name   = var.repo_name
@@ -58,6 +59,7 @@ data "template_file" "policy_arns" {
   vars = {
     name        = "${var.name_prefix}${var.repo_name}"
     name_prefix = var.name_prefix
+    name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
     region      = data.aws_region.current.name
     repo_name   = var.repo_name
