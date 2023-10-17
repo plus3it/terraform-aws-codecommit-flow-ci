@@ -28,7 +28,7 @@ module "test_branch" {
   policy_arns = each.value.policy_arns
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 
   policy_override = <<-OVERRIDE
@@ -81,7 +81,34 @@ module "test_review" {
   }
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
+  }
+}
+
+locals {
+  on_demand = {
+    on_demand_1 = {
+      repo_name   = "test-on-demand-1-flow-ci"
+      policy_arns = []
+    }
+    on_demand_2 = {
+      repo_name   = "test-on-demand-2-flow-ci"
+      policy_arns = null
+    }
+  }
+}
+
+module "test_on_demand" {
+  for_each = local.on_demand
+  source   = "../../"
+
+  name_prefix = "tardigrade-"
+  event       = "on-demand"
+  repo_name   = each.value.repo_name
+  policy_arns = each.value.policy_arns
+
+  environment = {
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 
@@ -110,7 +137,7 @@ module "test_schedule" {
   schedule_expression = "cron(0 11 ? * MON-FRI *)"
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 
@@ -137,7 +164,7 @@ module "test_tag" {
   policy_arns = each.value.policy_arns
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 

@@ -22,6 +22,28 @@ module "branch" {
   vpc_config            = var.vpc_config
 }
 
+module "on_demand" {
+  source = "./modules/on-demand"
+  count  = var.event == "on-demand" ? 1 : 0
+
+  name_prefix = var.name_prefix
+  repo_name   = var.repo_name
+
+  artifacts             = var.artifacts
+  buildspec             = var.buildspec
+  badge_enabled         = var.badge_enabled
+  build_timeout         = var.build_timeout
+  encryption_key        = var.encryption_key
+  environment           = var.environment
+  environment_variables = var.environment_variables
+  policy_arns           = var.policy_arns
+  policy_override       = var.policy_override
+  queued_timeout        = var.queued_timeout
+  source_version        = var.source_version
+  tags                  = var.tags
+  vpc_config            = var.vpc_config
+}
+
 module "review" {
   source = "./modules/review"
   count  = var.event == "review" ? 1 : 0

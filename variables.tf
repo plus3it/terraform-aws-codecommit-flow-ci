@@ -6,6 +6,7 @@ variable "event" {
     condition = contains(
       [
         "branch",
+        "on-demand",
         "review",
         "schedule",
         "tag",
@@ -13,7 +14,7 @@ variable "event" {
       var.event
     )
 
-    error_message = "The event must be one of: branch, review, schedule, or tag."
+    error_message = "The event must be one of: branch, on-demand, review, schedule, or tag."
   }
 }
 

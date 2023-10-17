@@ -21,7 +21,7 @@ module "test_branch" {
   vpc_config  = local.vpc_config
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 
   policy_override = <<-OVERRIDE
@@ -77,7 +77,7 @@ module "test_review" {
   }
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 
@@ -107,7 +107,7 @@ module "test_schedule" {
   schedule_expression = "cron(0 11 ? * MON-FRI *)"
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 
@@ -135,7 +135,7 @@ module "test_tag" {
   vpc_config  = local.vpc_config
 
   environment = {
-    compute_type = "BUILD_GENERAL1_LARGE"
+    compute_type = "BUILD_GENERAL1_SMALL"
   }
 }
 
