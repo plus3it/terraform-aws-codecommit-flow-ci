@@ -1,6 +1,6 @@
-# terraform-aws-codecommit-flow-ci/tag
+# terraform-aws-codecommit-flow-ci/on-demand
 
-Trigger a build when a CodeCommit tag is created.
+Trigger a build on demand.
 
 <!-- BEGIN TFDOCS -->
 ## Requirements
@@ -11,14 +11,11 @@ Trigger a build when a CodeCommit tag is created.
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+No providers.
 
 ## Resources
 
-| Name | Type |
-|------|------|
+No resources.
 
 ## Inputs
 
@@ -35,7 +32,6 @@ Trigger a build when a CodeCommit tag is created.
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Prefix to attach to repo name | `string` | `""` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | List of IAM policy ARNs to attach to the CodeBuild service role or null to support ignoring externally attached policies | `list(string)` | `[]` | no |
 | <a name="input_policy_override"></a> [policy\_override](#input\_policy\_override) | IAM policy document in JSON that extends the basic inline CodeBuild service role | `string` | `""` | no |
-| <a name="input_python_runtime"></a> [python\_runtime](#input\_python\_runtime) | Python runtime for the handler Lambda function | `string` | `null` | no |
 | <a name="input_queued_timeout"></a> [queued\_timeout](#input\_queued\_timeout) | How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out | `number` | `null` | no |
 | <a name="input_source_version"></a> [source\_version](#input\_source\_version) | A version of the build input to be built for this project. If not specified, the latest version is used | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the resource | `map(string)` | `{}` | no |
@@ -48,10 +44,5 @@ Trigger a build when a CodeCommit tag is created.
 | <a name="output_codebuild_project_arn"></a> [codebuild\_project\_arn](#output\_codebuild\_project\_arn) | ARN of the CodeBuild Project |
 | <a name="output_codebuild_project_name"></a> [codebuild\_project\_name](#output\_codebuild\_project\_name) | Name of the CodeBuild Project |
 | <a name="output_codebuild_project_service_role"></a> [codebuild\_project\_service\_role](#output\_codebuild\_project\_service\_role) | ARN of the CodeBuild Project Service Role |
-| <a name="output_events_rule_codebuild_arn"></a> [events\_rule\_codebuild\_arn](#output\_events\_rule\_codebuild\_arn) | ARN of the CloudWatch Event Rule for CodeBuild |
-| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | ARN of the Lambda function |
-| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | Name of the Lambda function |
-| <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | ARN of the Lambda IAM Role |
-| <a name="output_lambda_role_name"></a> [lambda\_role\_name](#output\_lambda\_role\_name) | Name of the Lambda IAM Role |
 
 <!-- END TFDOCS -->

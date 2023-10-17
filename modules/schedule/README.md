@@ -1,4 +1,4 @@
-# terraform-aws-codecommit-flow-ci/review
+# terraform-aws-codecommit-flow-ci/schedule
 
 Trigger a build on a schedule.
 

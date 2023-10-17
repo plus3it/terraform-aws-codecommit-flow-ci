@@ -29,6 +29,7 @@ The top-level module is a wrapper around each of the "event" modules. There is
 also a public module for each of the events mentioned above:
 
 * [branch](modules/branch)
+* [on-demand](modules/on-demand)
 * [review](modules/review) -- i.e. the pull request event
 * [tag](modules/tag)
 * [schedule](modules/schedule)
@@ -48,6 +49,11 @@ of its CodeBuild job executions and comments on the associated pull request
 with the status of the CodeBuild job. CodeCommit does not have anything like
 the GitHub Status API or Checks API, so these comments at least allow users to
 get updates on whether the CI passed/failed right within the pull request.
+
+The `on-demand` module is different in that it has no Lambda, and no CloudWatch
+Event to trigger it. Instead, it is expected that the user will trigger the
+job "on demand" using the StartBuild API, or otherwise integrate it into their
+own workflow.
 
 ## A complete example workflow
 
