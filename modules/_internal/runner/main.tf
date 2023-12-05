@@ -9,10 +9,18 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
+  account_id = data.aws_caller_identity.current.account_id
+  partition  = data.aws_partition.current.partition
+  region     = data.aws_region.current.name
+}
+
+locals {
   name_slug     = "${var.name_prefix}${var.repo_name}-${var.stage}-flow-ci"
-  log_group_arn = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${local.name_slug}"
-  repo_arn      = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
-  repo_url      = "https://git-codecommit.${data.aws_region.current.name}.amazonaws.com/v1/repos/${var.repo_name}"
+  log_group_arn = "arn:${local.partition}:logs:${local.region}:${local.account_id}:log-group:/aws/codebuild/${local.name_slug}"
+  repo_arn      = "arn:${local.partition}:codecommit:${local.region}:${local.account_id}:${var.repo_name}"
+  repo_url      = "https://git-codecommit.${local.region}.amazonaws.com/v1/repos/${var.repo_name}"
+
+
 }
 
 locals {
@@ -103,10 +111,44 @@ data "aws_iam_policy_document" "codebuild" {
     for_each = var.vpc_config != null ? [var.vpc_config] : []
     content {
       actions = [
-        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeDhcpOptions",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface",
         "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs",
       ]
       resources = ["*"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.vpc_config != null ? [var.vpc_config] : []
+    content {
+      actions = [
+        "ec2:CreateNetworkInterfacePermission",
+      ]
+      resources = ["arn:${local.partition}:ec2:${local.region}:${local.account_id}:network-interface/*"]
+
+      condition {
+        test     = "StringEquals"
+        variable = "ec2:Subnet"
+
+        values = [
+          for subnet in statement.value.subnets :
+          "arn:${local.partition}:ec2:${local.region}:${local.account_id}:subnet/${subnet}"
+        ]
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "ec2:AuthorizedService"
+
+        values = [
+          "codebuild.amazonaws.com",
+        ]
+      }
     }
   }
 }
