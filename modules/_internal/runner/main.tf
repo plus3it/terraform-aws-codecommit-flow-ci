@@ -103,10 +103,44 @@ data "aws_iam_policy_document" "codebuild" {
     for_each = var.vpc_config != null ? [var.vpc_config] : []
     content {
       actions = [
-        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeDhcpOptions",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface",
         "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs",
       ]
       resources = ["*"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.vpc_config != null ? [var.vpc_config] : []
+    content {
+      actions = [
+        "ec2:CreateNetworkInterfacePermission",
+      ]
+      resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"]
+
+      condition {
+        test     = "StringEquals"
+        variable = "ec2:Subnet"
+
+        values = [
+          for subnet in vpc_config.value.subnets :
+          "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:subnet/${subnet}"
+        ]
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "ec2:AuthorizedService"
+
+        values = [
+          "codebuild.amazonaws.com",
+        ]
+      }
     }
   }
 }
