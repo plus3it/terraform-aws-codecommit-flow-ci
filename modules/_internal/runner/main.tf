@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "codebuild" {
         variable = "ec2:Subnet"
 
         values = [
-          for subnet in vpc_config.value.subnets :
+          for subnet in statement.value.subnets :
           "arn:${local.partition}:ec2:${local.region}:${local.account_id}:subnet/${subnet}"
         ]
       }
