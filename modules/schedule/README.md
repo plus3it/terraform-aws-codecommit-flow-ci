@@ -40,7 +40,7 @@ Trigger a build on a schedule.
 | <a name="input_queued_timeout"></a> [queued\_timeout](#input\_queued\_timeout) | How long in minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out | `number` | `null` | no |
 | <a name="input_source_version"></a> [source\_version](#input\_source\_version) | A version of the build input to be built for this project. If not specified, the latest version is used | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the resource | `map(string)` | `{}` | no |
-| <a name="input_vpc_config"></a> [vpc\_config](#input\_vpc\_config) | Object of inputs for the VPC configuration of the CodeBuild job | <pre>object({<br>    security_group_ids = list(string)<br>    subnets            = list(string)<br>    vpc_id             = string<br>  })</pre> | `null` | no |
+| <a name="input_vpc_config"></a> [vpc\_config](#input\_vpc\_config) | Object of inputs for the VPC configuration of the CodeBuild job | <pre>object({<br/>    security_group_ids = list(string)<br/>    subnets            = list(string)<br/>    vpc_id             = string<br/>  })</pre> | `null` | no |
 
 ## Outputs
 
