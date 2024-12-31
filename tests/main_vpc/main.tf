@@ -13,7 +13,7 @@ module "test_branch" {
   for_each = local.branches
   source   = "../../"
 
-  name_prefix = "tardigrade-"
+  name_prefix = "tardigrade-vpc-"
   event       = "branch"
   branch      = each.value.branch
   repo_name   = local.branch_repo_name
@@ -63,7 +63,7 @@ module "test_review" {
   for_each = local.reviews
   source   = "../../"
 
-  name_prefix    = "tardigrade-"
+  name_prefix    = "tardigrade-vpc-"
   event          = "review"
   repo_name      = each.value.repo_name
   policy_arns    = each.value.policy_arns
@@ -98,7 +98,7 @@ module "test_schedule" {
   for_each = local.schedules
   source   = "../../"
 
-  name_prefix = "tardigrade-"
+  name_prefix = "tardigrade-vpc-"
   event       = "schedule"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
@@ -128,7 +128,7 @@ module "test_tag" {
   for_each = local.tags
   source   = "../../"
 
-  name_prefix = "tardigrade-"
+  name_prefix = "tardigrade-vpc-"
   event       = "tag"
   repo_name   = each.value.repo_name
   policy_arns = each.value.policy_arns
