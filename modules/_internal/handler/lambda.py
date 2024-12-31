@@ -1,4 +1,5 @@
 """Lambda handlers that implement an event-based CI workflow for CodeCommit."""
+
 import collections
 import json
 import logging
