@@ -11,7 +11,7 @@ data "aws_region" "current" {}
 locals {
   account_id = data.aws_caller_identity.current.account_id
   partition  = data.aws_partition.current.partition
-  region     = data.aws_region.current.name
+  region     = data.aws_region.current.region
 }
 
 locals {
@@ -53,7 +53,7 @@ data "template_file" "codebuild_policy_override" {
     name_prefix = var.name_prefix
     name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
-    region      = data.aws_region.current.name
+    region      = data.aws_region.current.region
     repo_name   = var.repo_name
     account_id  = data.aws_caller_identity.current.account_id
   }
@@ -69,7 +69,7 @@ data "template_file" "policy_arns" {
     name_prefix = var.name_prefix
     name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
-    region      = data.aws_region.current.name
+    region      = data.aws_region.current.region
     repo_name   = var.repo_name
     account_id  = data.aws_caller_identity.current.account_id
   }
