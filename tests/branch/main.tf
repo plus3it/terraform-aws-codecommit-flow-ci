@@ -44,7 +44,7 @@ module "test_branch" {
                     }
                 },
                 "Effect": "Allow",
-                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.repo_name}",
+                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${local.repo_name}",
                 "Sid": ""
             }
         ]

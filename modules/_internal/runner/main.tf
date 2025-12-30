@@ -11,7 +11,7 @@ data "aws_region" "current" {}
 locals {
   account_id = data.aws_caller_identity.current.account_id
   partition  = data.aws_partition.current.partition
-  region     = data.aws_region.current.name
+  region     = data.aws_region.current.region
 }
 
 locals {
@@ -53,7 +53,7 @@ data "template_file" "codebuild_policy_override" {
     name_prefix = var.name_prefix
     name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
-    region      = data.aws_region.current.name
+    region      = data.aws_region.current.region
     repo_name   = var.repo_name
     account_id  = data.aws_caller_identity.current.account_id
   }
@@ -69,7 +69,7 @@ data "template_file" "policy_arns" {
     name_prefix = var.name_prefix
     name_slug   = local.name_slug
     partition   = data.aws_partition.current.partition
-    region      = data.aws_region.current.name
+    region      = data.aws_region.current.region
     repo_name   = var.repo_name
     account_id  = data.aws_caller_identity.current.account_id
   }
@@ -154,14 +154,24 @@ data "aws_iam_policy_document" "codebuild" {
 }
 
 resource "aws_iam_role" "codebuild" {
-  name_prefix         = "flow-ci-codebuild-service-role-"
-  description         = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
-  assume_role_policy  = data.aws_iam_policy_document.codebuild_assume_role.json
-  managed_policy_arns = var.policy_arns != null ? data.template_file.policy_arns[*].rendered : null
-  inline_policy {
-    name   = "${local.name_slug}-codebuild"
-    policy = data.aws_iam_policy_document.codebuild.json
-  }
+  name_prefix        = "flow-ci-codebuild-service-role-"
+  description        = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
+  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
+}
+
+# attach inline policy to the codebuild role
+resource "aws_iam_role_policy" "codebuild" {
+  name   = "${local.name_slug}-codebuild"
+  policy = data.aws_iam_policy_document.codebuild.json
+  role   = aws_iam_role.codebuild.name
+}
+
+# attach managed policies to the codebuild role
+resource "aws_iam_role_policy_attachment" "codebuild" {
+  for_each = toset(data.template_file.policy_arns)
+
+  role       = aws_iam_role.codebuild.id
+  policy_arn = each.value.rendered
 }
 
 # CodeBuild Resources

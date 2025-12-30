@@ -38,7 +38,7 @@ module "test_branch" {
                     }
                 },
                 "Effect": "Allow",
-                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.branch_repo_name}",
+                "Resource": "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${local.branch_repo_name}",
                 "Sid": ""
             }
         ]
@@ -149,6 +149,18 @@ locals {
       for subnet in aws_subnet.test : subnet.id
     ]
   }
+
+  azs = slice(data.aws_availability_zones.all.names, 0, 2)
+  subnets = [
+    {
+      availability_zone = local.azs[0]
+      cidr              = "10.0.0.0/24"
+    },
+    {
+      availability_zone = local.azs[1]
+      cidr              = "10.0.1.0/24"
+    },
+  ]
 }
 
 resource "aws_vpc" "test" {
@@ -159,10 +171,12 @@ resource "aws_vpc" "test" {
 }
 
 resource "aws_subnet" "test" {
-  for_each = toset(["10.0.0.0/24", "10.0.1.0/24"])
+  for_each = { for subnet in local.subnets : subnet.cidr => subnet }
 
-  vpc_id     = aws_vpc.test.id
-  cidr_block = each.value
+  availability_zone = each.value.availability_zone
+  cidr_block        = each.value.cidr
+  vpc_id            = aws_vpc.test.id
+
   tags = {
     Test = "Tardigrade - terraform-aws-code-commit-flow-ci/main_vpc"
   }
@@ -200,6 +214,12 @@ data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
+
+data "aws_availability_zones" "all" {
+  exclude_zone_ids = [
+    "use1-az3", # Excluded due to lack of nitro support
+  ]
+}
 
 output "test_branch" {
   value = module.test_branch

@@ -12,8 +12,8 @@ locals {
   stage             = "review"
   stage_description = "Execute a job/buildspec when a pull request is created or updated in ${var.repo_name}"
 
-  repo_arn                 = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
-  codebuild_log_stream_arn = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${var.repo_name}-review-flow-ci:log-stream:*"
+  repo_arn                 = "arn:${data.aws_partition.current.partition}:codecommit:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${var.repo_name}"
+  codebuild_log_stream_arn = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${var.repo_name}-review-flow-ci:log-stream:*"
 }
 
 locals {
