@@ -154,14 +154,24 @@ data "aws_iam_policy_document" "codebuild" {
 }
 
 resource "aws_iam_role" "codebuild" {
-  name_prefix         = "flow-ci-codebuild-service-role-"
-  description         = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
-  assume_role_policy  = data.aws_iam_policy_document.codebuild_assume_role.json
-  managed_policy_arns = var.policy_arns != null ? data.template_file.policy_arns[*].rendered : null
-  inline_policy {
-    name   = "${local.name_slug}-codebuild"
-    policy = data.aws_iam_policy_document.codebuild.json
-  }
+  name_prefix        = "flow-ci-codebuild-service-role-"
+  description        = "${local.name_slug}-codebuild-service-role -- Managed by Terraform"
+  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
+}
+
+# attach inline policy to the codebuild role
+resource "aws_iam_role_policy" "codebuild" {
+  name   = "${local.name_slug}-codebuild"
+  policy = data.aws_iam_policy_document.codebuild.json
+  role   = aws_iam_role.codebuild.name
+}
+
+# attach managed policies to the codebuild role
+resource "aws_iam_role_policy_attachment" "codebuild" {
+  for_each = toset(data.template_file.policy_arns)
+
+  role       = aws_iam_role.codebuild.id
+  policy_arn = each.value.rendered
 }
 
 # CodeBuild Resources
